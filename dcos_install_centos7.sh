@@ -872,8 +872,11 @@ enabled=1
 EOF
 sudo yum -y install kibana
 #configure kibana
-#echo "** Configuring Kibana..."
-#sudo cp /opt/kibana/config/kibana.yml /opt/kibana/config/kibana.yml.BAK
+echo "** Configuring Kibana..."
+sudo cp /opt/kibana/config/kibana.yml /opt/kibana/config/kibana.yml.BAK
+sudo tee /etc/yum.repos.d/kibana.repo <<-EOF
+elasticsearch.url: "http://$BOOTSTRAP_IP:9200"
+EOF
 #start kibana
 echo "** Starting Kibana..."
 sudo systemctl start kibana
