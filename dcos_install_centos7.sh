@@ -594,18 +594,12 @@ filebeat.prospectors:
     - /var/lib/mesos/slave/slaves/*/frameworks/*/executors/*/runs/latest/stderr
     - /var/log/mesos/*.log
 tail_files: true
-#output.elasticsearch:
-# Array of hosts to connect to.
-#hosts: ["$ELK_HOSTNAME:$ELK_PORT"]
-output.logstash:
-  # The Logstash hosts
-  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
+output.elasticsearch:
+  hosts: ["$ELK_HOSTNAME:$ELK_PORT"]
+#output.logstash:
+#  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
   ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
-  # Certificate for SSL client authentication
   ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
-  # Client Certificate Key
   ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
@@ -617,15 +611,12 @@ filebeat.prospectors:
   paths:
     - "-"
 tail_files: true
-output.logstash:
-  # The Logstash hosts
-  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
+output.elasticsearch:
+  hosts: ["$ELK_HOSTNAME:$ELK_PORT"]
+#output.logstash:
+#  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
   ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
-  # Certificate for SSL client authentication
   ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
-  # Client Certificate Key
   ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
