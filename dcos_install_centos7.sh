@@ -863,7 +863,7 @@ cd $WORKING_DIR/filebeat
 #get filebeat user template from github
 curl -O https://gist.githubusercontent.com/thisismitch/3429023e8438cc25b86c/raw/d8c479e2a1adcea8b1fe86570e42abab0f10f364/filebeat-index-template.json
 #load into localhost's elasticsearch
-curl -XPUT 'http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty' -d@filebeat-index-template.json
+curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@filebeat-index-template.json
 fi #if INSTALL_ELK = true
 #End of ELK install on bootstrap node
 ################################################################################################################################
