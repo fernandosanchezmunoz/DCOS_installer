@@ -598,9 +598,9 @@ output.elasticsearch:
   hosts: ["$ELK_HOSTNAME:$ELK_PORT"]
 #output.logstash:
 #  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
-  ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
-  ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
-  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
+#  ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
+#  ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
+#  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
 echo "** Configuring Filebeat to parse DC/OS journalctl logs ..."
@@ -615,9 +615,9 @@ output.elasticsearch:
   hosts: ["$ELK_HOSTNAME:$ELK_PORT"]
 #output.logstash:
 #  hosts: ["$LOGSTASH_HOSTNAME:$LOGSTASH_PORT"]
-  ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
-  ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
-  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
+#  ssl.certificate_authorities: ["/etc/pki/tls/certs/$ELK_CA_NAME"]
+#  ssl.certificate: "/etc/pki/tls/certs/$ELK_CERT_NAME"
+#  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
 EOF2
@@ -716,7 +716,7 @@ journalctl --since="now" -f                  \
 EOF
 
 echo "** Creating service to parse DC/OS Agent logs into Filebeat ..."
-sudo tee /etc/systemd/system/multi-user.target.wants/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -730,7 +730,7 @@ ExecStart=$FILEBEAT_LOG_PARSER_SCRIPT_AGENT
 [Install]
 WantedBy=multi-user.target
 EOF
-sudo chmod 755 sudo tee /etc/systemd/system/multi-user.target.wants/$FILEBEAT_JOURNALCTL_SERVICE
+sudo chmod 0755 sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE
 fi 
 #if role=MASTER
 
@@ -842,6 +842,7 @@ cluster.name: $CLUSTERNAME
 node.name: $CLUSTERNAME
 node.master: true
 node.data: true
+network.host: $BOOTSTRAP_IP
 index.number_of_shards: 2
 index.number_of_replicas: 1
 bootstrap.mlockall: true
@@ -877,81 +878,6 @@ sudo yum -y install kibana
 echo "** Starting Kibana..."
 sudo systemctl start kibana
 sudo chkconfig kibana on
-
-#Install Logstash
-echo "** Installing Logstash..."
-#add logstash repo
-sudo tee /etc/yum.repos.d/logstash.repo <<-EOF 
-[logstash-2.2]
-name=logstash repository for 2.2 packages
-baseurl=http://packages.elasticsearch.org/logstash/2.2/centos
-gpgcheck=1
-gpgkey=http://packages.elasticsearch.org/GPG-KEY-elasticsearch
-enabled=1
-EOF
-#install logstash
-sudo yum install -y logstash
-#configure logstash
-echo "** Configuring Logstash..."
-
-#copy bootstrap node's cert, CA and key for ELK use
-mkdir -p /etc/pki/tls/certs
-mkdir -p /etc/pki/tls/private
-sudo cp $WORKING_DIR/genconf/serve/$CA_NAME /etc/pki/tls/certs/$ELK_CA_NAME
-sudo cp $WORKING_DIR/genconf/serve/$CERT_NAME /etc/pki/tls/certs/$ELK_CERT_NAME
-sudo cp $WORKING_DIR/genconf/serve/$PEM_NAME /etc/pki/tls/certs/$ELK_PEM_NAME
-sudo cp $WORKING_DIR/genconf/serve/$KEY_NAME /etc/pki/tls/private/$ELK_KEY_NAME
-
-#Add logstash config
-# beats input that listens on 5044 and uses the SSL cert
-#https://www.elastic.co/guide/en/beats/filebeat/5.0/configuring-ssl-logstash.html
-sudo tee /etc/logstash/conf.d/02-beats-input.conf <<-EOF 
-input {
-  beats {
-    port => 5044
-    ssl => true
-    ssl_certificate_authorities => ["/etc/pki/tls/certs/$ELK_CA_NAME"]
-    ssl_certificate => "/etc/pki/tls/certs/$ELK_CERT_NAME"
-    ssl_key => "/etc/pki/tls/private/$ELK_KEY_NAME"
-    ssl_verify_mode => "force_peer"
-  }
-}
-EOF
-#filter looks for logs that are labeled as "syslog" type (by Filebeat), 
-#and it will try to use grok to parse incoming syslog logs to make it structured and query-able
-sudo tee /etc/logstash/conf.d/10-syslog-filter.conf <<-EOF 
-filter {
-  if [type] == "syslog" {
-    grok {
-      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
-      add_field => [ "received_at", "%{@timestamp}" ]
-      add_field => [ "received_from", "%{host}" ]
-    }
-    syslog_pri { }
-    date {
-      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
-    }
-  }
-}
-EOF
-#configures Logstash to store the beats data in Elasticsearch which is running at localhost:9200, 
-#in an index named after the beat used (filebeat, in our case)
-sudo tee /etc/logstash/conf.d/30-elasticsearch-output.conf <<-EOF 
-output {
-  elasticsearch {
-    hosts => ["localhost:9200"]
-    sniffing => true
-    manage_template => false
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
-  }
-}
-EOF
-echo "** Checking logstash configuration..."
-sudo service logstash configtest
-echo "** Launching logstash..."
-sudo systemctl restart logstash
-sudo chkconfig logstash on
 
 #Load Kibana dashboards
 echo "** Loading Kibana dashboards..."
