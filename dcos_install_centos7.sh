@@ -269,9 +269,6 @@ openssl req -nodes -config /etc/pki/tls/openssl.cnf -batch  -newkey rsa:4096 -no
 sudo cp $WORKING_DIR/genconf/serve/$CERT_NAME $WORKING_DIR/genconf/serve/$PEM_NAME
 sudo cp $WORKING_DIR/genconf/serve/$CERT_NAME $WORKING_DIR/genconf/serve/$CA_NAME
 
-echo "** DEBUG: Certificate generated: "$(ls $WORKING_DIR/genconf/serve/domain*)
-
-
 #Installer
 #################################################################
 #check whether the "dcos_generate_config.sh" script exists, download otherwise
