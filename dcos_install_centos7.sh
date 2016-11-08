@@ -617,7 +617,7 @@ After=filebeat.service
 Restart=always
 RestartSec=5
 ExecStart=/bin/sh -c '/usr/bin/journalctl --no-tail -f \
-  -u dcos-3dt.service \                            
+  -u dcos-3dt.service \
   -u dcos-3dt.socket \
   -u dcos-adminrouter-reload.service \
   -u dcos-adminrouter-reload.timer   \
@@ -649,7 +649,7 @@ ExecStart=/bin/sh -c '/usr/bin/journalctl --no-tail -f \
   -u dcos-spartan-watchdog.timer     \
   -u dcos-spartan.service            \
   -u dcos-vault.service              \
-  -u dcos-logrotate-master.service  \  
+  -u dcos-logrotate-master.service  \
   > /var/log/dcos/dcos.log 2>&1'
 ExecStartPre=/usr/bin/journalctl --vacuum-size=10M
 
@@ -682,7 +682,7 @@ ExecStart=/bin/sh -c '/usr/bin/journalctl --no-tail -f      \
   -u dcos-rexray.service                   \
   -u dcos-cfn-signal.service               \
   -u dcos-setup.service                    \
-  -u dcos-download.service                 \ 
+  -u dcos-download.service                 \
   -u dcos-signal.timer                     \
   -u dcos-epmd.service                     \
   -u dcos-spartan-watchdog.service         \
