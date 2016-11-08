@@ -598,6 +598,7 @@ EOF
 EOF2
 
 sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+sudo mkdir -p /var/log/dcos
 #read the $ROLE variable inside the node, don't translate it while running this in the bootstrap
 if [[ $ROLE == "master" ]]; then
 EOF2
@@ -606,7 +607,6 @@ EOF2
 sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
-sudo mkdir -p /var/log/dcos
 sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
 [Unit]
 Description=DCOS journalctl parser to filebeat
