@@ -49,7 +49,7 @@ ELK_CA_NAME=ca.crt
 ELK_HOSTNAME=$BOOTSTRAP_IP
 ELK_PORT=9200
 FILEBEAT_JOURNALCTL_CONFIG="/etc/filebeat/filebeat_journald.yml"
-FILEBEAT_JOURNALCTL_SERVICE="/etc/systemd/system/multi-user.target.wants/dcos-journalctl-filebeat.service"
+FILEBEAT_JOURNALCTL_SERVICE=dcos-journalctl-filebeat.service
 
 #pretty colours
 RED='\033[0;31m'
@@ -607,7 +607,7 @@ sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
 sudo mkdir -p /var/log/dcos
-sudo tee $FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/multi-user.target.wants/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -660,7 +660,7 @@ EOF
 else #if not master
 
 echo "** Creating service to parse DC/OS Agent logs into Filebeat ..."
-sudo tee $FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/multi-user.target.wants/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -705,7 +705,7 @@ fi
 
 echo "** Installed Filebeat (aka. logstash-forwarder) ... "
 
-sudo chmod 0755 $FILEBEAT_JOURNALCTL_SERVICE
+sudo chmod 0755 /etc/systemd/system/multi-user.target.wants/$FILEBEAT_JOURNALCTL_SERVICE
 sudo systemctl daemon-reload
 sudo systemctl start $FILEBEAT_JOURNALCTL_SERVICE
 sudo chkconfig $FILEBEAT_JOURNALCTL_SERVICE on
