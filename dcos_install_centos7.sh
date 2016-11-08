@@ -860,7 +860,7 @@ curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.z
 unzip beats-dashboards-*.zip
 cd beats-dashboards-*
 #modify load.sh to point to Elasticsearch on numbered interface
-sudo sed -i -e 's/ELASTICSEARCH=http:\/\/localhost:9200/ELASTICSEARCH=http:\/\/$ELK_HOSTNAME:$ELK_PORT/g' ./load.sh
+sudo sed -i -e "s/ELASTICSEARCH=http:\/\/localhost:9200/ELASTICSEARCH=http:\/\/$ELK_HOSTNAME:$ELK_PORT/g" ./load.sh
 ./load.sh
 
 #Load Filebeat index template in elasticsearch
