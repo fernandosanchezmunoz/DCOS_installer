@@ -48,8 +48,8 @@ ELK_PEM_NAME=logstash-forwarder.pem
 ELK_CA_NAME=ca.crt
 ELK_HOSTNAME=$BOOTSTRAP_IP
 ELK_PORT=9200
-FILEBEAT_JOURNALCTL_CONFIG=/etc/filebeat/filebeat_journald.yml
-FILEBEAT_JOURNALCTL_SERVICE=/etc/systemd/system/multi-user.target.wants/dcos-journalctl-filebeat.service
+FILEBEAT_JOURNALCTL_CONFIG="/etc/filebeat/filebeat_journald.yml"
+FILEBEAT_JOURNALCTL_SERVICE="/etc/systemd/system/multi-user.target.wants/dcos-journalctl-filebeat.service"
 
 #pretty colours
 RED='\033[0;31m'
