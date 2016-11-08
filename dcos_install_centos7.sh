@@ -700,8 +700,6 @@ ExecStartPre=/usr/bin/journalctl --vacuum-size=10M
 WantedBy=multi-user.target
 EOF
 
-EOF
-
 fi 
 #if role=MASTER
 
@@ -846,7 +844,7 @@ sudo yum -y install kibana
 #configure kibana
 echo "** Configuring Kibana..."
 sudo cp /opt/kibana/config/kibana.yml /opt/kibana/config/kibana.yml.BAK
-sudo tee /etc/yum.repos.d/kibana.repo <<-EOF
+sudo tee /opt/kibana/config/kibana.yml  <<-EOF
 elasticsearch.url: "http://$BOOTSTRAP_IP:9200"
 EOF
 #start kibana
