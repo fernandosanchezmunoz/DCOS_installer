@@ -521,7 +521,8 @@ ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/unzip-6.0-15.el7.
 ftp://rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/autogen-libopts-5.18-5.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntpdate-4.2.6p5-22.el7.centos.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntp-4.2.6p5-22.el7.centos.x86_64.rpm \
-ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/wget-1.14-10.el7_0.1.x86_64.rpm
+ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/wget-1.14-10.el7_0.1.x86_64.rpm \
+ftp://rpmfind.net/linux/centos/6.8/os/x86_64/Packages/nc-1.84-24.el6.x86_64.rpm
 
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
 tar xz curl 
