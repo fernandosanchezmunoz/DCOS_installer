@@ -515,7 +515,10 @@ EOF
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
  wget tar xz curl zip unzip ipset ntp 
 
-rpm -Uvh ftp://fr2.rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/libtool-ltdl-2.4.2-20.el7.x86_64.rpm
+yum install -y \
+ftp://fr2.rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/libtool-ltdl-2.4.2-20.el7.x86_64.rpm \
+ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-6.19-4.el7.x86_64.rpm \
+ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-libs-6.19-4.el7.x86_64.rpm
 
 #configure ntp
 sudo echo "server pool.ntp.org" > /etc/ntp.conf && \
