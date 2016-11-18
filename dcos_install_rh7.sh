@@ -936,7 +936,7 @@ dcos package install --options=marathon-lb-secret-options.json --yes marathon-lb
 
 clear
 #open up a tab with the public node:
-MESSAGE=$'Open up a tab pointing to: \n'
+MESSAGE=$'Marathon-LB is available at: \n'
 echo -e "${BLUE} $MESSAGE ${RED} http://$PUBLIC:9090/haproxy?stats ${NC}"
 
 #Check that installation finished successfully.
