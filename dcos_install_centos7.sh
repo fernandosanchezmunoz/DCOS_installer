@@ -861,8 +861,8 @@ sudo chkconfig kibana on
 echo "** Loading Kibana dashboards..."
 mkdir -p $WORKING_DIR/kibana
 cd $WORKING_DIR/kibana
-#curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
-curl -L -O https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-5.1.1.zip
+#load 1.0.0 dashboards
+curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
 unzip beats-dashboards-*.zip
 cd beats-dashboards-*
 #modify load.sh to point to Elasticsearch on numbered interface
@@ -877,6 +877,12 @@ cd $WORKING_DIR/filebeat
 curl -O https://gist.githubusercontent.com/thisismitch/3429023e8438cc25b86c/raw/d8c479e2a1adcea8b1fe86570e42abab0f10f364/filebeat-index-template.json
 #load into localhost's elasticsearch
 curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@filebeat-index-template.json
+
+#get 5.1.1 dashboards
+curl -L -O https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-5.1.1.zip
+unzip beats-dashboards-5.1.1.zip
+curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@beats-dashboards-5.1.1/filebeat/index-pattern/filebeat.json
+
 fi #if INSTALL_ELK = true
 #End of ELK install on bootstrap node
 ################################################################################################################################
