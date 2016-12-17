@@ -899,7 +899,8 @@ sudo chkconfig kibana on
 echo "** Loading Kibana dashboards..."
 mkdir -p $WORKING_DIR/kibana
 cd $WORKING_DIR/kibana
-curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
+#curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
+curl -L -O https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-5.1.1.zip
 unzip beats-dashboards-*.zip
 cd beats-dashboards-*
 #modify load.sh to point to Elasticsearch on numbered interface
