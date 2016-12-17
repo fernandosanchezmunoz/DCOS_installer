@@ -899,8 +899,7 @@ sudo chkconfig kibana on
 echo "** Loading Kibana dashboards..."
 mkdir -p $WORKING_DIR/kibana
 cd $WORKING_DIR/kibana
-#curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
-curl -L -O https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-5.1.1.zip
+curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
 unzip beats-dashboards-*.zip
 cd beats-dashboards-*
 #modify load.sh to point to Elasticsearch on numbered interface
@@ -911,10 +910,17 @@ sudo sed -i -e "s/ELASTICSEARCH=http:\/\/localhost:9200/ELASTICSEARCH=http:\/\/$
 echo "** Loading Filebeat index templates..."
 mkdir -p $WORKING_DIR/filebeat
 cd $WORKING_DIR/filebeat
-#get filebeat user template from github
-curl -O https://gist.githubusercontent.com/thisismitch/3429023e8438cc25b86c/raw/d8c479e2a1adcea8b1fe86570e42abab0f10f364/filebeat-index-template.json
+#OLD get filebeat user template from github
+#OLD curl -O https://gist.githubusercontent.com/thisismitch/3429023e8438cc25b86c/raw/d8c479e2a1adcea8b1fe86570e42abab0f10f364/filebeat-index-template.json
+#NEW get filebeat from the 5.1.1 dashboard templates
+curl -L -O https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-5.1.1.zip
+unzip beats-dashboards-5.1.1.zip
+
 #load into localhost's elasticsearch
-curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@filebeat-index-template.json
+#OLD curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@filebeat-index-template.json
+#NEW
+curl -XPUT "http://$BOOTSTRAP_IP:9200/_template/filebeat?pretty" -d@beats-dashboards-5.1.1/filebeat/index-pattern/filebeat.json
+
 fi #if INSTALL_ELK = true
 #End of ELK install on bootstrap node
 ################################################################################################################################
