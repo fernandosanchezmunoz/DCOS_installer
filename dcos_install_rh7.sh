@@ -191,9 +191,11 @@ curl https://bootstrap.pypa.io/get-pip.py | python3.4
 pip3 install --upgrade pip jsonschema
 
 #jq
-wget http://stedolan.github.io/jq/download/linux64/jq
+#wget http://stedolan.github.io/jq/download/linux64/jq
+wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32
+mv ./jq-linux32 jq
 chmod +x ./jq
-cp jq /usr/bin
+cp -f jq /usr/bin
 
 #configure ntp
 sudo echo "server $NTP_SERVER" > /etc/ntp.conf && \
