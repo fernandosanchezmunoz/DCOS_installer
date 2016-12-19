@@ -521,6 +521,7 @@ gpgkey=https://yum.dockerproject.org/gpg
 EOF
 
 #install docker engine, daemon and service, along with dependencies
+yum remove -y bind-libs-lite bind-license #to install bind-libs complete
 yum install -y \
 ftp://fr2.rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/libtool-ltdl-2.4.2-20.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-libs-6.19-4.el7.x86_64.rpm \
@@ -531,7 +532,10 @@ ftp://rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/autogen-libopts-5.18-
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntpdate-4.2.6p5-22.el7.centos.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntp-4.2.6p5-22.el7.centos.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/wget-1.14-10.el7_0.1.x86_64.rpm \
-ftp://rpmfind.net/linux/centos/6.8/os/x86_64/Packages/nc-1.84-24.el6.x86_64.rpm
+ftp://rpmfind.net/linux/centos/6.8/os/x86_64/Packages/nc-1.84-24.el6.x86_64.rpm \
+ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/bind-utils-9.9.4-29.el7.x86_64.rpm \
+ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/bind-libs-9.9.4-29.el7.x86_64.rpm \
+ftp://fr2.rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/bind-license-9.9.4-29.el7.noarch.rpm
 
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
 tar xz curl screen bind-utils
