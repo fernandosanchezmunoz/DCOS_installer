@@ -187,7 +187,7 @@ gpgkey=https://yum.dockerproject.org/gpg
 EOF
 
 #docker engine with selinux and other requirements
-sudo yum install -y epel-release
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.12.1-1.el7.centos.noarch \
 wget curl zip unzip ipset ntp screen git python-pip python34 jq nginx bind-utils
 curl https://bootstrap.pypa.io/get-pip.py | python3.4
