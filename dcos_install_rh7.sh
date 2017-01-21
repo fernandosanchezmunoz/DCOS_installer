@@ -78,6 +78,9 @@ else
   echo "** Operating system version check passed."
 fi
 
+#add DNS. AWS RH7.3 instances don't have one
+echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
+
 #make sure there's an internet connection
 if ping -q -c 1 -W 1 google.com >/dev/null; then
   echo "** connectivity to $HTTPSERVER is working."
@@ -436,6 +439,12 @@ echo "** Setting up installation directory.."
 mkdir -p /tmp/dcos
 cd /tmp/dcos
 
+EOF2
+sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2 #EOF without ticks: translate variables on generation
+#add DNS. AWS RH7.3 instances don't have one
+echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
+EOF2
+sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 #Make sure there's an internet connection
 if ping -q -c 1 -W 1 google.com >/dev/null; then
   echo "** Internet connectivity is working."
@@ -474,10 +483,8 @@ if [ ! -f $ROLE_FILE ]; then
 else
   ROLE=`cat $ROLE_FILE`
 fi
-EOF2
 
 #Update system
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 echo "** Updating system..."
 sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
 EOF2
