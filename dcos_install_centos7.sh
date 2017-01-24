@@ -28,8 +28,7 @@ INSTALL_ELK=false
 # These are for internal use and should not need modification
 #****************************************************************
 INTERFACE=$(ip route get 8.8.8.8| awk -F ' ' '{print $5}')   #name of the default route interface
-BOOTSTRAP_IP=$(ip addr show $INTERFACE | grep -Eo \
- '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1) #this node's eth0
+BOOTSTRAP_IP=$(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 SERVICE_NAME=dcos-bootstrap
 INSTALLER_FILE=$(basename $DOWNLOAD_URL)
 PASSWORD_HASH_FILE=$WORKING_DIR/.pshash
@@ -237,13 +236,12 @@ echo "** This is an EC2 instance. Using metadata to detect my IP."
 curl -fsSL http://169.254.169.254/latest/meta-data/local-ipv4
 EOF
 else
-        echo "** This is not an EC2 instance. Using my [eth0] interface as my IP."
-        #ip-detect script -- INTERFACE VERSION for BAREMETAL
-        sudo cat > $WORKING_DIR/genconf/ip-detect << 'EOF'
+        echo "** This is not an EC2 instance. Using my route towards $DNS_SERVER interface as my IP."
+        #ip-detect script -- INTERFACE VERSION for BAREMETAL or VM using route
+        sudo cat > $WORKING_DIR/genconf/ip-detect << EOF
 #!/usr/bin/env bash
 set -o nounset -o errexit
-PATH=/usr/sbin:/usr/bin:$PATH
-echo $(ip addr show eth0 | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
+echo $(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1)
 EOF
 fi
 

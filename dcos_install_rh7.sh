@@ -29,8 +29,7 @@ HTTP_SERVER="www.google.com"
 # These are for internal use and should not need modification
 #****************************************************************
 INTERFACE=$(ip route get 8.8.8.8| awk -F ' ' '{print $5}')   #name of the default route interface
-BOOTSTRAP_IP=$(ip addr show $INTERFACE | grep -Eo \
- '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1) #this node's eth0
+BOOTSTRAP_IP=$(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 REXRAY_CONFIG_FILE="rexray.yaml"  #relative to /genconf. Currently only Amazon EBS supported
 SERVICE_NAME=dcos-bootstrap
 BOOTSTRAP_FILE=$SERVICE_NAME.sh
@@ -256,11 +255,10 @@ EOF
 else
         echo "** This is not an EC2 instance. Using my [eth0] interface as my IP."
         #ip-detect script -- INTERFACE VERSION for BAREMETAL
-        sudo cat > $WORKING_DIR/genconf/ip-detect << 'EOF'
+        sudo cat > $WORKING_DIR/genconf/ip-detect << EOF
 #!/usr/bin/env bash
 set -o nounset -o errexit
-PATH=/usr/sbin:/usr/bin:$PATH
-echo $(ip addr show eth0 | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
+echo $(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1)
 EOF
 fi
 
