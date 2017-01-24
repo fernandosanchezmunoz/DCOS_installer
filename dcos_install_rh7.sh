@@ -23,6 +23,7 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true 
 INSTALL_ELK=false
+HTTP_SERVER="www.google.com"
 
 #****************************************************************
 # These are for internal use and should not need modification
@@ -82,10 +83,10 @@ fi
 echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
 
 #make sure there's an internet connection
-if ping -q -c 1 -W 1 google.com >/dev/null; then
-  echo "** connectivity to $HTTPSERVER is working."
+if ping -q -c 1 -W 1 $HTTP_SERVER >/dev/null; then
+  echo "** connectivity to $HTTP_SERVER is working."
 else
-  echo "** connectivity to $HTTPSERVER is not working. Aborting."
+  echo "** connectivity to $HTTP_SERVER is not working. Aborting."
   exit
 fi
 
