@@ -462,7 +462,7 @@ then
      [[ $ROLE != "slave_public" ]]
   then
      #invalid role passed as an argument
-     echo "** Invalid node ROLE detected as argument."
+     echo "** Invalid node $ROLE detected as argument."
      #delete $ROLE_FILE so that the next loop asks for it
      rm -f $ROLE_FILE
   else
