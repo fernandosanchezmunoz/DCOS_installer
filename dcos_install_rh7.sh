@@ -29,7 +29,7 @@ HTTP_SERVER="www.google.com"
 # These are for internal use and should not need modification
 #****************************************************************
 INTERFACE=$(ip route get 8.8.8.8| awk -F ' ' '{print $5}')   #name of the default route interface
-BOOTSTRAP_IP=$(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
+BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 REXRAY_CONFIG_FILE="rexray.yaml"  #relative to /genconf. Currently only Amazon EBS supported
 SERVICE_NAME=dcos-bootstrap
 BOOTSTRAP_FILE=$SERVICE_NAME.sh
