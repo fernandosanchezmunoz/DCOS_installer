@@ -254,16 +254,11 @@ mkdir -p $WORKING_DIR/genconf/serve  #to hold the cert before the serve is gener
 #add your ELK Server's private IP address to the subjectAltName (SAN) field of the SSL certificate that we are about to generate
 sudo cp /etc/pki/tls/openssl.cnf /etc/pki/tls/openssl.cnf.BAK
 #cert config: swap out [ v3_ca ] with [ v3_ca ]/nsubjectAltName = IP: $BOOTSTRAP_IP
-#sudo sed -i -e  "s/\[ v3_ca \]/\[ v3_ca \]/\\\nsubjectAltName = IP: $BOOTSTRAP_IP/g" /etc/pki/tls/openssl.cnf
 sudo sed -i -e "s/\[ v3_ca \]/\[ v3_ca \]\'$'\nsubjectAltName = IP: $BOOTSTRAP_IP/g" /etc/pki/tls/openssl.cnf
 #create the cert with the config
-#openssl req -nodes -config /etc/pki/tls/openssl.cnf -batch -newkey rsa:4096 -sha256 \
-# -keyout $WORKING_DIR/genconf/serve/$KEY_NAME -out $WORKING_DIR/genconf/serve/$CERT_NAME \
-# -subj "/C=US/ST=NY/L=NYC/O=Mesosphere/OU=SE/CN=registry.marathon.l4lb.thisdcos.directory"
 openssl req -nodes -config /etc/pki/tls/openssl.cnf -batch  -newkey rsa:4096 -nodes -sha256 -x509 -days 365\
  -keyout $WORKING_DIR/genconf/serve/$KEY_NAME  -out $WORKING_DIR/genconf/serve/$CERT_NAME \
  -subj "/C=US/ST=NY/L=NYC/O=Mesosphere/OU=SE/CN=registry.marathon.l4lb.thisdcos.directory"
-#openssl x509 -inform DER -outform PEM -in $WORKING_DIR/genconf/serve/$CERT_NAME -#out $WORKING_DIR/genconf/serve/$PEM_NAME
 sudo cp $WORKING_DIR/genconf/serve/$CERT_NAME $WORKING_DIR/genconf/serve/$PEM_NAME
 sudo cp $WORKING_DIR/genconf/serve/$CERT_NAME $WORKING_DIR/genconf/serve/$CA_NAME
 
