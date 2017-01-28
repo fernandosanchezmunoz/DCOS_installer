@@ -259,7 +259,7 @@ else
         sudo cat > $WORKING_DIR/genconf/ip-detect << EOF
 #!/usr/bin/env bash
 set -o nounset -o errexit
-echo $(/usr/sbin/ip route show to match $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1)
+echo $(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1)
 EOF
 fi
 
