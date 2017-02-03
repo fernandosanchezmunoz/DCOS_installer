@@ -164,7 +164,7 @@ cd $WORKING_DIR
 #Requirements
 #################################################################
 #update/upgrade
-sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
+sudo yum update --exclude=docker-engine,docker-engine-selinux,redhat-release* --assumeyes --tolerant
 systemctl stop firewalld &&  systemctl disable firewalld
 
 #DOCKER REQUIREMENTS
