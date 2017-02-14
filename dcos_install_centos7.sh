@@ -511,6 +511,7 @@ cat > /etc/systemd/system/docker.service.d/override.conf << EOF
 [Service]
 ExecStart=
 ExecStart=/usr/bin/docker daemon --storage-driver=overlay -H fd://
+MountFlags=shared
 EOF
 
 #restart docker with overlay storage driver
