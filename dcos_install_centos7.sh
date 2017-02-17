@@ -180,7 +180,8 @@ gpgkey=https://yum.dockerproject.org/gpg
 EOF
 
 #docker engine with selinux and other requirements
-sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos wget curl zip unzip ipset ntp screen bind-utils openssl
+sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos wget zip unzip ipset ntp screen bind-utils 
+sudo yum install -y curl openssl
 
 #jq
 curl -O http://stedolan.github.io/jq/download/linux64/jq
