@@ -183,7 +183,7 @@ EOF
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos wget curl zip unzip ipset ntp screen bind-utils openssl
 
 #jq
-wget http://stedolan.github.io/jq/download/linux64/jq
+curl -O http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
 cp jq /usr/bin
 
