@@ -23,6 +23,7 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true
 INSTALL_ELK=false
+DEVICEMAPPER_VOLUME="/dev/sdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
@@ -502,21 +503,22 @@ sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11
  wget tar xz curl zip unzip ipset ntp nc screen bind-utils
 
 #add overlay storage driver
-echo 'overlay'\
->> /etc/modules-load.d/overlay.conf
+#echo 'overlay'\
+#>> /etc/modules-load.d/overlay.conf
 
 #add docker override so that it starts with overlay storage driver
 mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/override.conf << EOF
 [Service]
 ExecStart=
-ExecStart=/usr/bin/docker daemon --storage-driver=overlay -H fd://
+#ExecStart=/usr/bin/docker daemon --storage-driver=overlay -H fd://
+ExecStart=/usr/bin/docker daemon --storage-driver=devicemapper -H fd://
 MountFlags=shared
 EOF
 
 #restart docker with overlay storage driver
 sudo systemctl stop docker && \
-sudo modprobe overlay && \
+#sudo modprobe overlay && \
 sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
