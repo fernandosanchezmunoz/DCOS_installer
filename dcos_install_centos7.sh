@@ -180,7 +180,7 @@ gpgkey=https://yum.dockerproject.org/gpg
 EOF
 
 #docker engine with selinux and other requirements
-sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos wget curl zip unzip ipset ntp screen bind-utils
+sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos wget curl zip unzip ipset ntp screen bind-utils openssl
 
 #jq
 wget http://stedolan.github.io/jq/download/linux64/jq
@@ -500,13 +500,13 @@ EOF
 
 #install docker engine, daemon and service, along with dependencies
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
- wget tar xz curl zip unzip ipset ntp nc screen bind-utils
+ wget tar xz curl zip unzip ipset ntp nc screen bind-utils openssl
 
 #add overlay storage driver
 #echo 'overlay'\
 #>> /etc/modules-load.d/overlay.conf
 
-#add docker override so that it starts with overlay storage driver
+#add docker override so that it starts with (MODIFIED-devicemapper)overlay storage driver
 mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/override.conf << EOF
 [Service]
@@ -529,19 +529,19 @@ sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 
 #Ask for manual intervention if required for docker storage driver change to overlay.
 #####################################################################################
-if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
-  echo -e "** ${RED}ERROR${NC}: Docker overlay driver couldn't be started automatically."
-  echo -e "${BLUE}** Please copy and paste manually the command below and run this installer again."
-  echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
-  read -p "** Press Enter to exit..."
-  exit 1
-else
+#if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
+#  echo -e "** ${RED}ERROR${NC}: Docker overlay driver couldn't be started automatically."
+#  echo -e "${BLUE}** Please copy and paste manually the command below and run this installer again."
+#  echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
+#  read -p "** Press Enter to exit..."
+#  exit 1
+#else
   #run the installer
-  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
-fi
+#  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
+#fi
 
 echo "** Running installer as $ROLE..."
-sudo bash /tmp/dcos/dcos_install.sh $ROLE
+sudo bash /tmp/dcos/dcos_install.sh -d $ROLE
 #catch result, print error if applicable. If the last entry of "dcos-setup" status is failed...
 
 ERROR=$(systemctl status dcos-setup | tail -n1 | grep "Job dcos-setup.service/start failed")
