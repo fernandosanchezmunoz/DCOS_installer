@@ -881,7 +881,8 @@ fi #if INSTALL_ELK = true
 yum install -y epel-release
 yum install -y git python-pip python34 jq nginx
 curl https://bootstrap.pypa.io/get-pip.py | python3.4
-pip3 install --upgrade pip jsonschema
+pip3 install --upgrade pip jsonschema requests
+pip install requests
 
 #Check that installation finished successfully.
 #################################################################
