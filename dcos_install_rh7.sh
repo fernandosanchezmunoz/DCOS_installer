@@ -210,13 +210,13 @@ sudo systemctl enable ntpd
 #>> /etc/modules-load.d/overlay.conf
 
 #docker override to boot with overlay storage driver
-mkdir -p /etc/systemd/system/docker.service.d
-cat > /etc/systemd/system/docker.service.d/override.conf << EOF
-[Service]
-ExecStart=
-ExecStart=/usr/bin/docker daemon --storage-driver=devicemapper -H fd://
-MountFlags=shared
-EOF
+#mkdir -p /etc/systemd/system/docker.service.d
+#cat > /etc/systemd/system/docker.service.d/override.conf << EOF
+#[Service]
+#ExecStart=
+#ExecStart=/usr/bin/docker daemon --storage-driver=devicemapper -H fd://
+#MountFlags=shared
+#EOF
 
 #restart docker with overlay driver and new configuration
 sudo systemctl stop docker &&\
@@ -513,14 +513,14 @@ echo 'overlay'\
 /bin/rm -f /etc/yum.repos.d/*
 
 #add docker repo
-sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
+#sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
+#[dockerrepo]
+#name=Docker Repository
+#baseurl=https://yum.dockerproject.org/repo/main/centos/7/
+#enabled=1
+#gpgcheck=1
+#gpgkey=https://yum.dockerproject.org/gpg
+#EOF
 
 #install docker engine, daemon and service, along with dependencies
 yum remove -y bind-libs-lite bind-license #to install bind-libs complete
@@ -551,17 +551,17 @@ sudo systemctl enable ntpd
 #>> /etc/modules-load.d/overlay.conf
 
 #add docker override so that it starts with overlay storage driver
-mkdir -p /etc/systemd/system/docker.service.d
-cat > /etc/systemd/system/docker.service.d/override.conf << EOF
-[Service]
-ExecStart=
-ExecStart=/usr/bin/docker daemon -H fd://
-MountFlags=shared
-EOF
+#mkdir -p /etc/systemd/system/docker.service.d
+#cat > /etc/systemd/system/docker.service.d/override.conf << EOF
+#[Service]
+#ExecStart=
+#ExecStart=/usr/bin/docker daemon -H fd://
+#MountFlags=shared
+#EOF
 
 #restart docker with overlay storage driver
 sudo systemctl stop docker && \
-sudo modprobe overlay && \
+#sudo modprobe overlay && \
 sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
