@@ -70,9 +70,9 @@ fi
 
 #make sure we're running on RHEL 7.2
 if [ $(grep "ID=" /etc/os-release | head -n1) != "ID=\"rhel\"" ] || \
-   [[ $(grep "ID=" /etc/os-release | tail -n1) != "VERSION_ID=\"7.2\"" && \
-      $(grep "ID=" /etc/os-release | tail -n1) != "VERSION_ID=\"7.3\"" ]]; then
-  echo "** This installer supports RHEL 7.2 and 7.3 only. Aborting"
+   [[ $(grep "ID=" /etc/os-release | tail -n1) != "VERSION_ID=\"7.2\"" ; then
+   #&& \ $(grep "ID=" /etc/os-release | tail -n1) != "VERSION_ID=\"7.3\"" ]]
+  echo "** This installer supports RHEL 7.2 only. Aborting"
   exit
 else
   echo "** Operating system version check passed."
@@ -195,7 +195,7 @@ pip3 install --upgrade pip jsonschema
 
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
-wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32
+curl -O https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32
 mv ./jq-linux32 jq
 chmod +x ./jq
 cp -f jq /usr/bin
@@ -206,37 +206,37 @@ sudo systemctl start ntpd && \
 sudo systemctl enable ntpd
 
 #add overlay storage driver to kernel modules
-echo 'overlay'\
->> /etc/modules-load.d/overlay.conf
+#echo 'overlay'\
+#>> /etc/modules-load.d/overlay.conf
 
 #docker override to boot with overlay storage driver
 mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/override.conf << EOF
 [Service]
 ExecStart=
-ExecStart=/usr/bin/docker daemon --storage-driver=overlay -H fd://
+ExecStart=/usr/bin/docker daemon --storage-driver=devicemapper -H fd://
 MountFlags=shared
 EOF
 
 #restart docker with overlay driver and new configuration
 sudo systemctl stop docker &&\
-sudo modprobe overlay && \
+#sudo modprobe overlay && \
 sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
 
 #Ask for manual intervention if required for docker storage driver change to overlay.
 #####################################################################################
-if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
-  echo "** ${RED}ERROR${NC}: Docker overlay driver couldn't be started automatically."
-  echo -e "${BLUE}** Please copy and paste manually the command below and run this installer again."
-  echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
-  read -p "** Press Enter to exit..."
-  exit 1
-else
+#if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
+#  echo "** ${RED}ERROR${NC}: Docker overlay driver couldn't be started automatically."
+#  echo -e "${BLUE}** Please copy and paste manually the command below and run this installer again."
+#  echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
+#  read -p "** Press Enter to exit..."
+#  exit 1
+#else
   #run the installer as we're ready for it
   sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
-fi
+#fi
 
 #Create config directory
 ########################
@@ -557,7 +557,7 @@ mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/override.conf << EOF
 [Service]
 ExecStart=
-ExecStart=/usr/bin/docker daemon --storage-driver=overlay -H fd://
+ExecStart=/usr/bin/docker daemon -H fd://
 MountFlags=shared
 EOF
 
@@ -586,7 +586,7 @@ else
 fi
 
 echo "** Running installer as $ROLE..."
-sudo bash /tmp/dcos/dcos_install.sh $ROLE
+sudo bash /tmp/dcos/dcos_install.sh -d $ROLE
 #catch result, print error if applicable. If the last entry of "dcos-setup" status is failed...
 
 ERROR=$(systemctl status dcos-setup | tail -n1 | grep "Job dcos-setup.service/start failed")
