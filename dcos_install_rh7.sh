@@ -481,7 +481,7 @@ fi
 
 #Update system
 echo "** Updating system..."
-sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
+sudo yum update --exclude=docker-engine,docker-engine-selinux,redhat-release* --assumeyes --tolerant
 EOF2
 
 sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
