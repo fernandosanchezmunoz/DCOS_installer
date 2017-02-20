@@ -524,12 +524,10 @@ EOF
 
 #install docker engine, daemon and service, along with dependencies
 yum remove -y bind-libs-lite bind-license #to install bind-libs complete
-yum install -y \
+yum install -y zip unzip \
 ftp://195.220.108.108/linux/centos/7.3.1611/os/x86_64/Packages/libtool-ltdl-2.4.2-21.el7_2.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/ipset-libs-6.19-4.el7.x86_64.rpm \
-ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-6.19-4.el7.x86_64.rpm \
-ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/zip-3.0-10.el7.x86_64.rpm \
-ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/unzip-6.0-15.el7.x86_64.rpm \
+ftp://bo.mirror.garr.it/1/slc/centos/7.2.1511/os/x86_64/Packages/ipset-6.19-4.el7.x86_64.rpm \
 ftp://rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/autogen-libopts-5.18-5.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntpdate-4.2.6p5-22.el7.centos.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ntp-4.2.6p5-22.el7.centos.x86_64.rpm \
