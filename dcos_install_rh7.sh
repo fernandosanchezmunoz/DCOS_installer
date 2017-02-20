@@ -526,7 +526,7 @@ EOF
 yum remove -y bind-libs-lite bind-license #to install bind-libs complete
 yum install -y \
 ftp://195.220.108.108/linux/centos/7.3.1611/os/x86_64/Packages/libtool-ltdl-2.4.2-21.el7_2.x86_64.rpm \
-ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-libs-6.19-4.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/ipset-libs-6.19-4.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/ipset-6.19-4.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/zip-3.0-10.el7.x86_64.rpm \
 ftp://195.220.108.108/linux/centos/7.2.1511/os/x86_64/Packages/unzip-6.0-15.el7.x86_64.rpm \
