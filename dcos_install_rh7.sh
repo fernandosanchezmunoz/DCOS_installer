@@ -549,8 +549,8 @@ sudo systemctl start ntpd && \
 sudo systemctl enable ntpd
 
 #add overlay storage driver
-echo 'overlay'\
->> /etc/modules-load.d/overlay.conf
+#echo 'overlay'\
+#>> /etc/modules-load.d/overlay.conf
 
 #add docker override so that it starts with overlay storage driver
 mkdir -p /etc/systemd/system/docker.service.d
