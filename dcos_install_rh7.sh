@@ -530,11 +530,12 @@ ftp://bo.mirror.garr.it/1/slc/centos/7.1.1503/updates/x86_64/Packages/ipset-libs
 ftp://bo.mirror.garr.it/1/slc/centos/7.1.1503/updates/x86_64/Packages/ipset-6.19-4.el7.x86_64.rpm \
 ftp://bo.mirror.garr.it/1/slc/centos/7.0.1406/os/x86_64/Packages/zip-3.0-10.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.1/x86_64/updates/security/unzip-6.0-15.el7.x86_64.rpm \
-ftp://rpmfind.net/linux/centos/7.2.1511/os/x86_64/Packages/autogen-libopts-5.18-5.el7.x86_64.rpm \
+ftp://fr2.rpmfind.net/linux/centos/7.3.1611/os/x86_64/Packages/autogen-libopts-5.18-5.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/ntpdate-4.2.6p5-22.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/ntp-4.2.6p5-22.el7.x86_64.rpm \
 ftp://bo.mirror.garr.it/1/slc/centos/7.1.1503/updates/x86_64/Packages/wget-1.14-10.el7_0.1.x86_64.rpm \
 ftp://fr2.rpmfind.net/linux/centos/6.8/os/x86_64/Packages/nc-1.84-24.el6.x86_64.rpm \
+ftp://bo.mirror.garr.it/1/slc/centos/7.2.1511/os/x86_64/Packages/bind-libs-9.9.4-29.el7.x86_64.rpm \
 ftp://bo.mirror.garr.it/1/slc/centos/7.2.1511/os/x86_64/Packages/bind-utils-9.9.4-29.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/bind-utils-9.9.4-29.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/os/Packages/bind-license-9.9.4-29.el7.noarch.rpm
