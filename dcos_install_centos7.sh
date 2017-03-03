@@ -710,7 +710,7 @@ fi
 #if INSTALL_ELK=true
 
 #fix for Zeppelin -- add FQDN
-sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
+sudo sh -c "echo $($WORKING_DIR/genconf/ip-detect) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
 # $$ end of node installer
 #################################################################
