@@ -597,6 +597,10 @@ if [[ $ERROR = *[!\ ]* ]]; then
 else
   echo "** Node installed successfully."
 fi
+
+#fix for Zeppelin -- add FQDN
+sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
+
 EOF2
 
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
@@ -759,9 +763,6 @@ sudo chkconfig filebeat on
 EOF2
 fi 
 #if INSTALL_ELK=true
-
-#fix for Xeppeling -- add FQDN
-sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
 # $$ end of node installer
 #################################################################
