@@ -713,8 +713,9 @@ EOF2
 fi
 #if INSTALL_ELK=true
 
+#install the newest REXRAY on agents and swap out the old one in the DCOS installation
+if [[ $ROLE != "master" ]]; then
 sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
-#install the newest REXRAY and swap out the old one in the DCOS installation
 #find out the rexray location
 REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
 LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
@@ -728,6 +729,7 @@ mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 systemctl restart dcos-rexray
 EOF2
+fi
 
 # $$ end of node installer
 #################################################################
