@@ -146,7 +146,7 @@ echo "**************************************************************************
             [6]) read -p "Enter new value for NTP server: " NTP_SERVER
                  ;;
             [7]) read -p "Enter new value for DNS server: " DNS_SERVER
-                 ;;  
+                 ;;
             [8]) if [ "$INSTALL_ELK" == false ]; then INSTALL_ELK=true; else INSTALL_ELK=false; fi
                  ;;
               *) echo "** Invalid input. Please choose an option [1-8]"
@@ -288,13 +288,13 @@ PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 echo "** Generating external persistent volumes configuration file for Amazon EBS..."
 
 cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
-rexray:
-  loglevel: info
-  storageDrivers:
-    - ec2
-  volume:
-    unmount:
-      ignoreusedcount: true
+libstorage:
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd
 EOF
 
 #Generate configuration files
@@ -352,7 +352,7 @@ echo "** Running local $NGINX_NAME container to serve installation files..."
 sudo docker rm -f $NGINX_NAME
 /usr/bin/docker run -d -p $BOOTSTRAP_PORT:80 -v $WORKING_DIR/genconf/serve:/usr/share/nginx/html:ro \
         --name=$NGINX_NAME nginx
-sleep 2        
+sleep 2
 if [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) == "false" ]; then
   echo -e "** Running local $NGINX_NAME container ${RED}FAILED${NC}. Exiting."
   exit 1
@@ -558,7 +558,7 @@ EOF2
 
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
-if [ "$INSTALL_ELK" = true ]; then 
+if [ "$INSTALL_ELK" = true ]; then
 sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Installing Filebeat (aka. logstash-forwarder) ... "
@@ -566,10 +566,10 @@ echo "** Installing Filebeat (aka. logstash-forwarder) ... "
 #copy SSL certificate and key from bootstrap
 sudo mkdir -p /etc/pki/tls/certs
 sudo mkdir -p /etc/pki/tls/private
-curl -o /etc/pki/tls/certs/$ELK_CERT_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CERT_NAME 
+curl -o /etc/pki/tls/certs/$ELK_CERT_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CERT_NAME
 curl -o /etc/pki/tls/certs/$ELK_CA_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CA_NAME
-curl -o /etc/pki/tls/private/$ELK_KEY_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$KEY_NAME 
-curl -o /etc/pki/tls/certs/$ELK_PEM_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$PEM_NAME 
+curl -o /etc/pki/tls/private/$ELK_KEY_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$KEY_NAME
+curl -o /etc/pki/tls/certs/$ELK_PEM_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$PEM_NAME
 
 #install filebeat
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.0.0-x86_64.rpm
@@ -578,7 +578,7 @@ sudo rpm -vi filebeat-5.0.0-x86_64.rpm
 #configure filebeat
 echo "** Configuring Filebeat (aka. logstash-forwarder) ..."
 sudo mv /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.BAK
-sudo tee /etc/filebeat/filebeat.yml <<-EOF 
+sudo tee /etc/filebeat/filebeat.yml <<-EOF
 filebeat.prospectors:
 - input_type: log
   paths:
@@ -608,7 +608,7 @@ EOF2
 sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
-sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -659,7 +659,7 @@ EOF
 else #if not master
 
 echo "** Creating service to parse DC/OS Agent logs into Filebeat ..."
-sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -697,7 +697,7 @@ ExecStartPre=/usr/bin/journalctl --vacuum-size=10M
 WantedBy=multi-user.target
 EOF
 
-fi 
+fi
 #if role=MASTER
 
 echo "** Installed Filebeat (aka. logstash-forwarder) ... "
@@ -710,8 +710,23 @@ sudo systemctl start filebeat
 sudo chkconfig filebeat on
 
 EOF2
-fi 
+fi
 #if INSTALL_ELK=true
+
+sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+#install the newest REXRAY and swap out the old one in the DCOS installation
+#find out the rexray location
+REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
+LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
+CMD=$(echo $LAST_LINE|awk '{print $1}')
+LOCATION=${CMD:10}
+#download the latest rexray
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
+#swap out the installed rexray for the downloaded one
+LOCATION_BAK=$LOCATION'.bak'
+mv $LOCATION $LOCATION_BAK
+mv /usr/bin/rexray $LOCATION
+systemctl restart dcos-rexray
 
 # $$ end of node installer
 #################################################################
@@ -747,7 +762,7 @@ curl -fLsS --retry 20 -Y 100000 -y 60 $CLI_DOWNLOAD_URL -o dcos &&
  dcos config set core.dcos_url http://$MASTER_1 &&
  dcos config set core.ssl_verify false &&
  dcos
- 
+
  #Insert Mesos-DNS as resolver in bootstrap node to access *.mesos
  #################################################################
  mv -f /etc/resolv.conf /etc/resolv.conf.dcos #backup
@@ -785,7 +800,7 @@ fi
 # Install ELK on Bootstrap node:
 ################################################################################################################################
 ################################################################################################################################
-if [ "$INSTALL_ELK" = true ]; then 
+if [ "$INSTALL_ELK" = true ]; then
 echo -e "** Installing ${BLUE}ELK${NC}..."
 #Install Java 8
 echo "** Installing Java 8..."
@@ -795,7 +810,7 @@ rm -f jdk-8u*-linux-x64.rpm
 #Install elasticsearch
 echo "** Installing Elasticsearch..."
 sudo rpm --import http://packages.elastic.co/GPG-KEY-elasticsearch
-sudo tee /etc/yum.repos.d/elasticsearch.repo <<-EOF 
+sudo tee /etc/yum.repos.d/elasticsearch.repo <<-EOF
 [elasticsearch-2.x]
 name=Elasticsearch repository for 2.x packages
 baseurl=http://packages.elastic.co/elasticsearch/2.x/centos
