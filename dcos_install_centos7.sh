@@ -729,7 +729,7 @@ mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 
 #add the configuration
-cat > /etc/rexray/config.yaml << EOF
+cat > /etc/rexray/config.yml << EOF
 libstorage:
   server:
     services:
