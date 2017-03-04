@@ -727,6 +727,7 @@ LOCATION_BAK=$LOCATION'.bak'
 mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 systemctl restart dcos-rexray
+'EOF2'
 
 # $$ end of node installer
 #################################################################
