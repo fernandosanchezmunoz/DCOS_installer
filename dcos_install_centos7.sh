@@ -283,9 +283,9 @@ else
 fi
 PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 
-#generate Rex-ray configuration file for external persistent volumes with Amazon EBS
+#generate Rex-ray configuration file for external persistent volumes with Ceph RBD
 ####################################################################################
-echo "** Generating external persistent volumes configuration file for Amazon EBS..."
+echo "** Generating external persistent volumes configuration file for Ceph RBD.."
 
 cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
 libstorage:
