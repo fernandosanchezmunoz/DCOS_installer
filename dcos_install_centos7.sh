@@ -727,6 +727,18 @@ curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
 LOCATION_BAK=$LOCATION'.bak'
 mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
+
+#add the configuration
+cat > /etc/rexray.config.yaml << EOF
+libstorage:
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd
+EOF
+
 systemctl restart dcos-rexray
 EOF2
 fi
