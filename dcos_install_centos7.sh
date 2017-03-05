@@ -740,6 +740,7 @@ libstorage:
 EOF
 
 systemctl restart dcos-rexray
+systemctl status dcos-rexray #show running version
 EOF2
 fi
 
