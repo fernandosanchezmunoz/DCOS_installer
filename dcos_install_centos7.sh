@@ -730,13 +730,10 @@ mv /usr/bin/rexray $LOCATION
 
 #add the configuration
 cat > /etc/rexray/config.yml << EOF
+rexray:
+#  loglevel: debug
 libstorage:
-  server:
-    services:
-      rbd:
-        driver: rbd
-        rbd:
-          defaultPool: rbd
+  service: rbd
 EOF
 
 systemctl restart dcos-rexray
