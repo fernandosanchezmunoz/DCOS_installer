@@ -14,7 +14,9 @@ CEPH_INSTALLER="ceph_installer.sh"
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
-
+#serve address
+BOOTSTRAP_PORT=80
+BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
 #pretty colours
 RED='\033[0;31m'
@@ -85,21 +87,22 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
   caps osd = "allow *"
 EOF
 
+#copy ceph installer to serve directory
+cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
+
 #install ceph
 yum install -y centos-release-ceph-jewel
 yum install -y ceph
 
-
 #check correct functioning
-
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
-
-#output: "got monmap epoch 3"
+#expected output: "got monmap epoch 3"
 
 /bin/python /bin/ceph -s
 
 EOF2
 
+sudo cat >> $CEPH_INSTALLER  << EOF2
 #copy installer to serve directory
 cp CEPH_INSTALLER $SERVE_PATH
 
