@@ -110,8 +110,7 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
 EOF
 
 #install ceph on bootstrap for testing
-yum install -y centos-release-ceph-jewel
-yum install -y ceph
+rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
 
 #check correct functioning
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
@@ -132,8 +131,7 @@ sudo tee $CEPH_INSTALLER <<-EOF2
 EOF2
 sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
 #install ceph
-yum install -y centos-release-ceph-jewel
-yum install -y ceph
+rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
 
 #get config and keys from bootstrap node, place in the right directory
 curl -s -o CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
