@@ -60,29 +60,12 @@ if [[ ${SECRETS} != *"fsid"* ]]; then
 	exit 1
 fi
 
-#ceph_installer.sh
-######################
-#generate ceph_installer.sh with keys
-sudo tee $CEPH_INSTALLER <<-EOF2
-#EOF2 without ticks - translate $SECRET and variables when running on bootstrap
-export SECRETS='$SECRETS'
-export CEPH_CONF=$CEPH_CONF
-export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
-export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
-export CEPH_CONF_PATH=$CEPH_CONF_PATH
-
-EOF2
-
-sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
-#install jq
-wget http://stedolan.github.io/jq/download/linux64/jq
-chmod +x ./jq
-yes | mv -f jq /usr/bin
-
 #configure ceph
 mkdir -p $CEPH_CONF_PATH
 cd $CEPH_CONF_PATH
 
+
+#generate Ceph configuration files for the cluster on bootstrap
 #ceph.conf
 export HOST_NETWORK=0.0.0.0/0 
 rpm --rebuilddb && yum install -y bind-utils
@@ -126,7 +109,7 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
   caps osd = "allow *"
 EOF
 
-#install ceph
+#install ceph on bootstrap for testing
 yum install -y centos-release-ceph-jewel
 yum install -y ceph
 
@@ -136,14 +119,38 @@ yum install -y ceph
 
 /bin/python /bin/ceph -s
 
+#copy ceph.conf and keyrings to SERVE directory
+cp $CEPH_INSTALLER $SERVE_PATH
+cp $CEPH_CONF $SERVE_PATH
+cp $CEPH_MON_KEYRING $SERVE_PATH
+cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
+
+#generate ceph_installer.sh to be used in agents
+#######################################
+sudo tee $CEPH_INSTALLER <<-EOF2
+#no inherited variables to translate
+EOF2
+sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
+#install ceph
+yum install -y centos-release-ceph-jewel
+yum install -y ceph
+
+#get config and keys from bootstrap node, place in the right directory
+curl -s -o CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
+curl -s -o CEPH_MON_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING)
+curl -s -o CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING)
+
+#check correct functioning
+/bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
+#expected output if Ceph is running: "got monmap epoch 3"
+/bin/python /bin/ceph -s
+
+#display finished message
 echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 
 EOF2
 ######################
 #end of ceph installer
-
-#copy ceph installer to serve directory
-cp $CEPH_INSTALLER $SERVE_PATH
 
 #print message to copy&paste in the agents
 #serve address
