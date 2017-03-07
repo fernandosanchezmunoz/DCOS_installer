@@ -64,11 +64,12 @@ fi
 mkdir -p $CEPH_CONF_PATH
 cd $CEPH_CONF_PATH
 
+#install ceph on bootstrap for testing
+rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
 
 #generate Ceph configuration files for the cluster on bootstrap
 #ceph.conf
 export HOST_NETWORK=0.0.0.0/0 
-rpm --rebuilddb && yum install -y bind-utils
 export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
 echo "**DEBUG: SECRETS: "$SECRETS
 echo "**DEBUG: MONITORS: "$MONITORS
@@ -108,9 +109,6 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
   caps mon = "allow *"
   caps osd = "allow *"
 EOF
-
-#install ceph on bootstrap for testing
-rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
 
 #check correct functioning
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
