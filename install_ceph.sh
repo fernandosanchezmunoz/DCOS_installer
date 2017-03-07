@@ -31,7 +31,7 @@ dcos auth login
 echo "** INFO: Installing ceph on mesos..."
 dcos package install --yes ceph
 
-until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
+until $(curl -s --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
     printf '** INFO: Waiting for Ceph on DC/OS to be available...'
     sleep 2
 done
@@ -119,9 +119,8 @@ EOF
 /bin/python /bin/ceph -s
 
 #find out my serve address for printing message to copy&paste in the agents
-DNS_SERVER=8.8.8.8
 BOOTSTRAP_PORT=80
-BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
+BOOTSTRAP_IP=$(/usr/sbin/ip route get 8.8.8.8| grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
 #generate ceph_installer.sh to be used in agents
 #######################################
