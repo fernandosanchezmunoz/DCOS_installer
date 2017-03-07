@@ -75,8 +75,10 @@ mkdir -p /etc/ceph
 export HOST_NETWORK=0.0.0.0/0 
 rpm --rebuilddb && yum install -y bind-utils
 export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
+echo "**DEBUG: SECRETS: "$SECRETS
+echo "**DEBUG: MONITORS: "$MONITORS
 
-sudo cat >> $CEPH_CONF  << 'EOF'
+cat <<-EOF > $CEPH_CONF
 [global]
 fsid = $(echo "$SECRETS" | jq .fsid)
 mon host = "${MONITORS::-1}"
