@@ -75,6 +75,7 @@ mkdir -p /etc/ceph
 export HOST_NETWORK=0.0.0.0/0 
 rpm --rebuilddb && yum install -y bind-utils
 export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
+
 sudo cat >> $CEPH_CONF  << 'EOF'
 [global]
 fsid = $(echo "$SECRETS" | jq .fsid)
@@ -126,13 +127,7 @@ EOF2
 #end of ceph installer
 
 #copy ceph installer to serve directory
-echo -e "** DEBUG: cp $CEPH_INSTALLER $SERVE_PATH..."
 cp $CEPH_INSTALLER $SERVE_PATH
-#copy ceph.conf and keyrings to serve
-cp $CEPH_CONF $SERVE_PATH$(basename $CEPH_CONF)
-cp $CEPH_CONF $DCOS_INSTALL_PATH$(basename $CEPH_CONF) #for reference and manual use
-cp $CEPH_MON_KEYRING $SERVE_PATH$(basename $CEPH_MON_KEYRING)
-cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH$(basename $CEPH_CLIENT_ADMIN_KEYRING)
 
 #print message to copy&paste in the agents
 #serve address
