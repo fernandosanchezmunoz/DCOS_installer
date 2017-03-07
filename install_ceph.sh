@@ -19,6 +19,11 @@ CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
 CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
 
+#install CEPH on DC/OS
+read -p "This installer requires a RUNNING Ceph framework on DC/OS. Have you INSTALLED and CONFIGURED Ceph on DC/OS? (y/n)"$REPLY
+if [[ "$REPLY" == "n"]]; then
+	exit 1
+fi
 
 #pretty colours
 RED='\033[0;31m'
