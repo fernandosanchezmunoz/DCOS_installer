@@ -16,6 +16,7 @@ CEPH_INSTALLER="ceph_installer.sh"
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
 #serve address
+DNS_SERVER=8.8.8.8
 BOOTSTRAP_PORT=80
 BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
