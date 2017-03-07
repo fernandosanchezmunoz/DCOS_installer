@@ -118,6 +118,11 @@ EOF
 
 /bin/python /bin/ceph -s
 
+#find out my serve address for printing message to copy&paste in the agents
+DNS_SERVER=8.8.8.8
+BOOTSTRAP_PORT=80
+BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
+
 #generate ceph_installer.sh to be used in agents
 #######################################
 cat <<-EOF > $CEPH_INSTALLER 
@@ -148,11 +153,6 @@ cp $CEPH_CONF $SERVE_PATH
 cp $CEPH_MON_KEYRING $SERVE_PATH
 cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
-#print message to copy&paste in the agents
-#serve address
-DNS_SERVER=8.8.8.8
-BOOTSTRAP_PORT=80
-BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
 echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL CEPH:"
 echo -e ""
