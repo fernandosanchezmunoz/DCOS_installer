@@ -288,13 +288,10 @@ PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 echo "** Generating external persistent volumes configuration file for Ceph RBD.."
 
 cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
+rexray:
+#  loglevel: debug
 libstorage:
-  server:
-    services:
-      rbd:
-        driver: rbd
-        rbd:
-          defaultPool: rbd
+  service: rbd
 EOF
 
 #Generate configuration files
