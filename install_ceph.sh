@@ -33,6 +33,9 @@ export SECRETS=$SECRETS
 # example: export SECRETS='{"fsid":"bc74ca0d-ff9a-480d-ac18-ccad34d144d4","adminRing":"AQBAxDxYFv/CBRAALIZk22t8X3q3WS8+cHuoKQ==","monRing":"AQBAxDxY9o4BDBAA3hv1p/SJiHhwe5KwWOddug==","mdsRing":"AQBAxDxYa2YCDBAAXZjSsMWBNkdaKtjiXmNVig==","osdRing":"AQBAxDxYeiYDDBAANaBgkJi98oA1chOk4tvXUQ==","rgwRing":"AQBAxDxY4RAEDBAAV5APHwy6clkNAON8rwSP2w=="}'
 
 EOF2
+
+#ceph_installer.sh
+######################
 sudo cat >> $CEPH_INSTALLER  << 'EOF2'
 
 #install jq
@@ -87,9 +90,6 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
   caps osd = "allow *"
 EOF
 
-#copy ceph installer to serve directory
-cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
-
 #install ceph
 yum install -y centos-release-ceph-jewel
 yum install -y ceph
@@ -100,11 +100,13 @@ yum install -y ceph
 
 /bin/python /bin/ceph -s
 
-EOF2
 
-sudo cat >> $CEPH_INSTALLER  << EOF2
-#copy installer to serve directory
-cp CEPH_INSTALLER $SERVE_PATH
+EOF2 #ceph_installer.sh
+######################
+#end of ceph installer
+
+#copy ceph installer to serve directory
+cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
 
 #print message to copy&paste in the agents
 
