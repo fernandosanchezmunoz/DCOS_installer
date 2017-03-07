@@ -51,6 +51,11 @@ SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
 SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
 echo "** DEBUG: Secrets is: "$SECRETS
 
+if [[ $string != *"fsid"* ]]; then
+	echo "** ERROR: Couldn't get key from Zookeeper. Please check your Ceph DC/OS framework is running, healthy and CONFIGURED. Check https://github.com/dcos/examples/tree/master/1.8/ceph for details."
+	exit 1
+fi
+
 #ceph_installer.sh
 ######################
 #generate ceph_installer.sh with keys
