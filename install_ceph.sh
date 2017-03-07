@@ -118,6 +118,6 @@ cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF) $CEPH_CONF"
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING) $CEPH_MON_KEYRING"
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING) $CEPH_CLIENT_ADMIN_KEYRING"
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename '$CEPH_INSTALLER') ${NC}"
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER) ${NC}"
   echo -e ""
   echo -e "** ${BLUE}Done${NC}."
