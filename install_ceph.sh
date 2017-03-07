@@ -69,6 +69,8 @@ export SECRETS='$SECRETS'
 export CEPH_CONF=$CEPH_CONF
 export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
 export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
+export CEPH_CONF_PATH=$CEPH_CONF_PATH
+
 EOF2
 
 sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
@@ -78,7 +80,8 @@ chmod +x ./jq
 yes | mv -f jq /usr/bin
 
 #configure ceph
-mkdir -p /etc/ceph
+mkdir -p $CEPH_CONF_PATH
+cd $CEPH_CONF_PATH
 
 #ceph.conf
 export HOST_NETWORK=0.0.0.0/0 
@@ -129,9 +132,11 @@ yum install -y ceph
 
 #check correct functioning
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
-#expected output: "got monmap epoch 3"
+#expected output if Ceph is running: "got monmap epoch 3"
 
 /bin/python /bin/ceph -s
+
+echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 
 EOF2
 ######################
@@ -152,7 +157,7 @@ echo -e "${RED}sudo su"
 echo -e "cd"
 echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
-echo -e "${NC}Ceph will be available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
+echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 echo -e "${BLUE}** Done${NC}."
 
 #remove this installer along with the secret
