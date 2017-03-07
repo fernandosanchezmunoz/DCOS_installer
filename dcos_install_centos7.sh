@@ -724,7 +724,7 @@ fi
 #if INSTALL_ELK=true
 
 #install the newest REXRAY on agents and swap out the old one in the DCOS installation
-if [[ $ROLE != "master" ]]; then
+if [[ $ROLE == "slave" ]]; then
 echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
 #find out the rexray location
 REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
