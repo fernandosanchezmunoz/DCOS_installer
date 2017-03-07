@@ -58,6 +58,8 @@ sudo cat >> $CEPH_INSTALLER  << EOF2
 #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
 export SECRETS=$SECRETS
 export CEPH_CONF=$CEPH_CONF
+export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
+export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
 EOF2
 
 sudo cat >> $CEPH_INSTALLER  << 'EOF2' #with ticks -- rest of variables kept literal to translate on agents
