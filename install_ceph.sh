@@ -32,7 +32,7 @@ NC='\033[0m' # No Color
 
 #depencencies
 #jq
-wget http://stedolan.github.io/jq/download/linux64/jq
+curl -O http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
 cp jq /usr/bin
 #zkCLi
