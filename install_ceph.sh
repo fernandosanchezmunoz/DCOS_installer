@@ -62,7 +62,7 @@ export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
 export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
 EOF2
 
-sudo tee -a $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
+sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
 #install jq
 wget http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
