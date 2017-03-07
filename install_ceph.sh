@@ -54,7 +54,7 @@ echo "** DEBUG: Secrets is: "$SECRETS
 #ceph_installer.sh
 ######################
 #generate ceph_installer.sh with keys
-sudo cat >> $CEPH_INSTALLER  << EOF2
+sudo tee $CEPH_INSTALLER <<-EOF2
 #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
 export SECRETS=$SECRETS
 export CEPH_CONF=$CEPH_CONF
@@ -62,7 +62,7 @@ export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
 export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
 EOF2
 
-sudo cat >> $CEPH_INSTALLER  << 'EOF2' #with ticks -- rest of variables kept literal to translate on agents
+sudo tee -a $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
 #install jq
 wget http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
@@ -72,11 +72,10 @@ yes | cp -rf jq /usr/bin
 mkdir -p /etc/ceph
 
 #ceph.conf
-sudo cat >> $CEPH_CONF  << 'EOF'
 export HOST_NETWORK=0.0.0.0/0 
 rpm --rebuilddb && yum install -y bind-utils
 export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
-cat <<-EOF > /etc/ceph/ceph.conf
+sudo cat >> $CEPH_CONF  << 'EOF'
 [global]
 fsid = $(echo "$SECRETS" | jq .fsid)
 mon host = "${MONITORS::-1}"
