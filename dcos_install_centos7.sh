@@ -578,7 +578,6 @@ sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | 
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
 if [ "$INSTALL_ELK" = true ]; then
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 
 echo "** Installing Filebeat (aka. logstash-forwarder) ... "
 
