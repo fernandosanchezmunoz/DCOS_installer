@@ -385,12 +385,15 @@ systemctl daemon-reload
 echo "** Generating agent launcher..."
 
 mkdir -p $WORKING_DIR/genconf/serve/
+
 # $$ start node installer
 # $$ EOF2 without ticks - "translate variables on execution" -- export variables from main script into agent
-sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
+
+sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-EOF2
+
 #!/bin/bash
 #
-# DC/OS Installer script for cluster nodes
+# Installer script for DC/OS cluster nodes
 # Author: Fernando Sanchez (fernando at mesosphere.com)
 #
 
@@ -413,7 +416,7 @@ FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
 EOF2
 
 # $$ 'EOF2' with ticks - "leave variable names as they are here"
-sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2'
 
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
