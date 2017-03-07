@@ -1009,3 +1009,6 @@ else
   echo -e "** Temporary files deleted. Please ${BLUE}run the installer again${NC}."
   exit 0
 fi
+
+echo -e "** ${NC}In order to instal ${RED}CEPH on DC/OS${NC} run: "
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_ceph.sh)${NC}"
