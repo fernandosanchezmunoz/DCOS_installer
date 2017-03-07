@@ -24,7 +24,7 @@ BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
 #get SECRETS from Zookeeper
-SECRETS=$(curl -s leader.mesos)
+SECRETS=$(curl -s leader.mesos)"FAKESECRET"
 
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
@@ -47,7 +47,6 @@ yes | cp -rf jq /usr/bin
 mkdir -p /etc/ceph
 
 #ceph.conf
-
 sudo cat >> $CEPH_CONF  << 'EOF'
 export HOST_NETWORK=0.0.0.0/0 
 rpm --rebuilddb && yum install -y bind-utils
@@ -72,7 +71,6 @@ rbd_default_features = 1
 EOF
 
 #ceph.mon.keyring
-
 cat <<-EOF > $CEPH_MON_KEYRING
 [mon.]
  key = $(echo "$SECRETS" | jq .monRing -r)
@@ -80,7 +78,6 @@ cat <<-EOF > $CEPH_MON_KEYRING
 EOF
 
 #ceph.client.admin.keyring
-
 cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
 [client.admin]
   key = $(echo "$SECRETS" | jq .adminRing -r)
@@ -100,8 +97,8 @@ yum install -y ceph
 
 /bin/python /bin/ceph -s
 
-
-EOF2 #ceph_installer.sh
+EOF2 
+#ceph_installer.sh
 ######################
 #end of ceph installer
 
