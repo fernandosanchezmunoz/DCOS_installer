@@ -56,7 +56,7 @@ echo "** DEBUG: Secrets is: "$SECRETS
 #generate ceph_installer.sh with keys
 sudo tee $CEPH_INSTALLER <<-EOF2
 #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
-export SECRETS='\'$SECRETS\'
+export SECRETS='$SECRETS'
 export CEPH_CONF=$CEPH_CONF
 export CEPH_MON_KEYRING=$CEPH_MON_KEYRING
 export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CLIENT_ADMIN_KEYRING
