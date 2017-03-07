@@ -119,9 +119,7 @@ EOF
 #generate ceph_installer.sh to be used in agents
 #######################################
 sudo tee $CEPH_INSTALLER <<-EOF2
-#no inherited variables to translate
-EOF2
-sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
+
 #install ceph
 rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph ceph
 
@@ -136,7 +134,7 @@ curl -s -o CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(base
 /bin/python /bin/ceph -s
 
 #display finished message
-echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
+echo -e "${NC}Ceph is available at http://PUBLIC_NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 
 EOF2
 ######################
