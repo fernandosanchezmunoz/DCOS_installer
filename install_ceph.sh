@@ -25,7 +25,7 @@ BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
 #get SECRETS from Zookeeper
-SECRETS=$(curl -s leader.mesos)"FAKESECRET"
+SECRETS="$(curl -s leader.mesos)""FAKESECRET"
 
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
