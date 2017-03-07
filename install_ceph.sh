@@ -29,10 +29,8 @@ SECRETS=$(curl -s leader.mesos)"FAKESECRET"
 
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
-
 export SECRETS=$SECRETS
 # example: export SECRETS='{"fsid":"bc74ca0d-ff9a-480d-ac18-ccad34d144d4","adminRing":"AQBAxDxYFv/CBRAALIZk22t8X3q3WS8+cHuoKQ==","monRing":"AQBAxDxY9o4BDBAA3hv1p/SJiHhwe5KwWOddug==","mdsRing":"AQBAxDxYa2YCDBAAXZjSsMWBNkdaKtjiXmNVig==","osdRing":"AQBAxDxYeiYDDBAANaBgkJi98oA1chOk4tvXUQ==","rgwRing":"AQBAxDxY4RAEDBAAV5APHwy6clkNAON8rwSP2w=="}'
-
 EOF2
 
 #ceph_installer.sh
@@ -104,6 +102,7 @@ EOF2
 #end of ceph installer
 
 #copy ceph installer to serve directory
+echo -e "** DEBUG: cp $CEPH_INSTALLER $SERVE_PATH..."
 cp $CEPH_INSTALLER $SERVE_PATH
 #copy ceph.conf and keyrings to serve
 cp $CEPH_CONF $SERVE_PATH
