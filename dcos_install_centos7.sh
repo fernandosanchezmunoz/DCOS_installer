@@ -416,7 +416,7 @@ FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
 EOF2
 
 # $$ 'EOF2' with ticks - "leave variable names as they are here"
-sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2'
+sudo tee -a $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2'
 
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
