@@ -97,7 +97,7 @@ yum install -y ceph
 
 /bin/python /bin/ceph -s
 
-EOF2 
+EOF2
 #ceph_installer.sh
 ######################
 #end of ceph installer
