@@ -995,7 +995,6 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
    echo -e "** Kibana is available at http://"$BOOTSTRAP_IP":5601"
   fi
   echo -e "** ${BLUE}Done${NC}."
-  exit 1
 else
   echo -e "** Bootstrap node installation ${RED}FAILED${NC}."
   echo "** Deleting temporary files..."
