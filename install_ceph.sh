@@ -104,11 +104,11 @@ EOF2
 #end of ceph installer
 
 #copy ceph installer to serve directory
-cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
+cp $CEPH_INSTALLER $SERVE_PATH
 #copy ceph.conf and keyrings to serve
-cp $CEPH_CONF $DCOS_INSTALL_PATH"/"$SERVE_PATH
-cp $CEPH_MON_KEYRING $DCOS_INSTALL_PATH"/"$SERVE_PATH
-cp $CEPH_CLIENT_ADMIN_KEYRING $DCOS_INSTALL_PATH"/"$SERVE_PATH
+cp $CEPH_CONF $SERVE_PATH
+cp $CEPH_MON_KEYRING $SERVE_PATH
+cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
 #print message to copy&paste in the agents
 
