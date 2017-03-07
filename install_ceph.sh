@@ -42,16 +42,21 @@ SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
 SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
 echo "** DEBUG: Secrets is: "$SECRETS
 
-#generate ceph_installer.sh with keys
-sudo cat >> $CEPH_INSTALLER  << EOF2
-
-export SECRETS=$SECRETS
-# example: export SECRETS='{"fsid":"bc74ca0d-ff9a-480d-ac18-ccad34d144d4","adminRing":"AQBAxDxYFv/CBRAALIZk22t8X3q3WS8+cHuoKQ==","monRing":"AQBAxDxY9o4BDBAA3hv1p/SJiHhwe5KwWOddug==","mdsRing":"AQBAxDxYa2YCDBAAXZjSsMWBNkdaKtjiXmNVig==","osdRing":"AQBAxDxYeiYDDBAANaBgkJi98oA1chOk4tvXUQ==","rgwRing":"AQBAxDxY4RAEDBAAV5APHwy6clkNAON8rwSP2w=="}'
-EOF2
 
 #ceph_installer.sh
 ######################
-sudo cat >> $CEPH_INSTALLER  << 'EOF2'
+#generate ceph_installer.sh with keys
+sudo cat >> $CEPH_INSTALLER  << EOF2
+
+export SECRETS=$SECRETS   #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
+export CEPH_CONF_PATH="/etc/ceph"
+export CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
+export CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
+export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
+
+EOF2
+
+sudo cat >> $CEPH_INSTALLER  << 'EOF2' #with ticks -- rest of variables kept literal to translate on agents
 
 #install jq
 wget http://stedolan.github.io/jq/download/linux64/jq
