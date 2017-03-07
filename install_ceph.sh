@@ -15,10 +15,6 @@ CEPH_INSTALLER="ceph_installer.sh"
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
-#serve address
-DNS_SERVER=8.8.8.8
-BOOTSTRAP_PORT=80
-BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
 #pretty colours
 RED='\033[0;31m'
@@ -111,14 +107,18 @@ cp $CEPH_MON_KEYRING $SERVE_PATH
 cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
 #print message to copy&paste in the agents
+#serve address
+DNS_SERVER=8.8.8.8
+BOOTSTRAP_PORT=80
+BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
-  echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL CEPH:"
-  echo -e ""
-  echo -e "${RED}sudo su"
-  echo -e "cd"
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF) $CEPH_CONF"    
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING) $CEPH_MON_KEYRING"
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING) $CEPH_CLIENT_ADMIN_KEYRING"
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
-  echo -e ""
-  echo -e "${BLUE}** Done${NC}."
+echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL CEPH:"
+echo -e ""
+echo -e "${RED}sudo su"
+echo -e "cd"
+echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF) $CEPH_CONF"    
+echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING) $CEPH_MON_KEYRING"
+echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING) $CEPH_CLIENT_ADMIN_KEYRING"
+echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
+echo -e ""
+echo -e "${BLUE}** Done${NC}."
