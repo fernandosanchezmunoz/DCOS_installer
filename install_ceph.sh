@@ -116,12 +116,6 @@ EOF
 
 /bin/python /bin/ceph -s
 
-#copy ceph.conf and keyrings to SERVE directory
-cp $CEPH_INSTALLER $SERVE_PATH
-cp $CEPH_CONF $SERVE_PATH
-cp $CEPH_MON_KEYRING $SERVE_PATH
-cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
-
 #generate ceph_installer.sh to be used in agents
 #######################################
 sudo tee $CEPH_INSTALLER <<-EOF2
@@ -147,6 +141,12 @@ echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in an
 EOF2
 ######################
 #end of ceph installer
+
+#copy installer, ceph.conf and keyrings to SERVE directory
+cp $CEPH_INSTALLER $SERVE_PATH
+cp $CEPH_CONF $SERVE_PATH
+cp $CEPH_MON_KEYRING $SERVE_PATH
+cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
 #print message to copy&paste in the agents
 #serve address
