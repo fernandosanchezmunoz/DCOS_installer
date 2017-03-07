@@ -66,7 +66,7 @@ sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept lite
 #install jq
 wget http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
-yes | cp -rf jq /usr/bin
+yes | mv -f jq /usr/bin
 
 #configure ceph
 mkdir -p /etc/ceph
