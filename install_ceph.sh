@@ -65,7 +65,7 @@ mkdir -p $CEPH_CONF_PATH
 cd $CEPH_CONF_PATH
 
 #install ceph on bootstrap for testing
-rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
+rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph ceph
 
 #generate Ceph configuration files for the cluster on bootstrap
 #ceph.conf
@@ -129,7 +129,7 @@ sudo tee $CEPH_INSTALLER <<-EOF2
 EOF2
 sudo tee -a $CEPH_INSTALLER <<-'EOF2' #with ticks -- rest of variables kept literal to translate on agents
 #install ceph
-rpm --rebuilddb && yum install -y bind-utils centos-release-ceph-jewel ceph
+rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph ceph
 
 #get config and keys from bootstrap node, place in the right directory
 curl -s -o CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
