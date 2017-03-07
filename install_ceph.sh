@@ -5,9 +5,10 @@
 #- a working Ceph DC/OS service
 #- jq
 
-CEPH_CONF="/etc/ceph/ceph.conf"
-CEPH_MON_KEYRING="/etc/ceph/ceph.mon.keyring"
-CEPH_CLIENT_ADMIN_KEYRING="/etc/ceph/ceph.client.admin.keyring"
+CEPH_CONF_PATH="/etc/ceph"
+CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
+CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
+CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
 
 #find out serve directory location
@@ -104,6 +105,10 @@ EOF2
 
 #copy ceph installer to serve directory
 cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
+#copy ceph.conf and keyrings to serve
+cp $CEPH_CONF $DCOS_INSTALL_PATH"/"$SERVE_PATH
+cp $CEPH_MON_KEYRING $DCOS_INSTALL_PATH"/"$SERVE_PATH
+cp $CEPH_CLIENT_ADMIN_KEYRING $DCOS_INSTALL_PATH"/"$SERVE_PATH
 
 #print message to copy&paste in the agents
 
@@ -111,6 +116,9 @@ cp $CEPH_INSTALLER $DCOS_INSTALL_PATH"/"$SERVE_PATH
   echo -e ""
   echo -e "${RED}sudo su"
   echo -e "cd"
-  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CEPH_INSTALLER && sudo bash $CEPH_INSTALLER ${NC}"
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename "$CEPH_CONF") $CEPH_CONF
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename "$CEPH_MON_KEYRING") $CEPH_MON_KEYRING
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename "$CEPH_CLIENT_ADMIN_KEYRING") $CEPH_CLIENT_ADMIN_KEYRING
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename "$CEPH_INSTALLER") && sudo bash $(basename "$CEPH_INSTALLER") ${NC}"
   echo -e ""
   echo -e "** ${BLUE}Done${NC}."
