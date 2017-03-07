@@ -47,9 +47,9 @@ chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
 git clone https://github.com/id/zookeeper-el7-rpm
 cd zookeeper-el7-rpm/
-sudo yum install -y make rpmdevtools
-make rpm
-yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm
+sudo yum install -y make rpmdevtools > /dev/null 2>&1
+make rpm > /dev/null 2>&1
+yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm > /dev/null 2>&1
 cp /usr/local/bin/zkcli /usr/bin
 
 #get SECRETS from Zookeeper
