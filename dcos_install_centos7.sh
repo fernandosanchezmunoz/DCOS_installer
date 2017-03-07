@@ -23,6 +23,9 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true
 INSTALL_ELK=false
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+CEPH_DISKS="/dev/xvdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
@@ -383,14 +386,31 @@ echo "** Generating agent launcher..."
 
 mkdir -p $WORKING_DIR/genconf/serve/
 # $$ start node installer
-# $$ 'EOF2' with ticks - "leave variable names as they are here"
-sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+# $$ EOF2 without ticks - "translate variables on execution" -- export variables from main script into agent
+sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 #!/bin/bash
 #
 # DC/OS Installer script for cluster nodes
 # Author: Fernando Sanchez (fernando at mesosphere.com)
 #
 
+CEPH_DISKS=$CEPH_DISKS
+BOOTSTRAP_IP=$BOOTSTRAP_IP
+BOOTSTRAP_PORT=$BOOTSTRAP_PORT
+WORKING_DIR=$WORKING_DIR
+BOOTSTRAP_FILE=$BOOTSTRAP_FILE
+NODE_INSTALLER=$NODE_INSTALLER
+CERT_NAME=$CERT_NAME
+CA_NAME=$CA_NAME
+KEY_NAME=$KEY_NAME
+PEM_NAME=$PEM_NAME
+ELK_HOSTNAME=$ELK_HOSTNAME
+ELK_PORT=$ELK_PORT
+FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
+EOF2
+
+# $$ 'EOF2' with ticks - "leave variable names as they are here"
+sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
 RED='\033[0;31m'
@@ -451,16 +471,12 @@ if [ ! -f $ROLE_FILE ]; then
 else
   ROLE=`cat $ROLE_FILE`
 fi
-EOF2
 
 #Update system
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 echo "** Updating system..."
 sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
-EOF2
 
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
-
+#download installer
 echo "** Downloading installer from $BOOTSTRAP_IP..."
 curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/dcos_install.sh
 
@@ -479,6 +495,11 @@ sed -i s/SELINUX=enforcing/SELINUX=permissive/g /etc/selinux/config
 setenforce 0
 
 echo "** Installing dependencies..."
+
+#install jq
+wget http://stedolan.github.io/jq/download/linux64/jq
+chmod +x ./jq
+yes | cp -rf jq /usr/bin
 
 #Docker with overlayfs
 echo 'overlay'\
@@ -518,10 +539,6 @@ sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
-
 #Ask for manual intervention if required for docker storage driver change to overlay.
 #####################################################################################
 if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
@@ -551,12 +568,10 @@ fi
 #fix for Zeppelin -- add FQDN
 sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
-EOF2
-
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
 if [ "$INSTALL_ELK" = true ]; then
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
+sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 
 echo "** Installing Filebeat (aka. logstash-forwarder) ... "
 
@@ -593,16 +608,9 @@ output.elasticsearch:
 #  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 sudo mkdir -p /var/log/dcos
 #read the $ROLE variable inside the node, don't translate it while running this in the bootstrap
 if [[ $ROLE == "master" ]]; then
-EOF2
-
-#back to variable substitution when running in bootstrap
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
 sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF
@@ -706,13 +714,12 @@ sudo chkconfig $FILEBEAT_JOURNALCTL_SERVICE on
 sudo systemctl start filebeat
 sudo chkconfig filebeat on
 
-EOF2
 fi
 #if INSTALL_ELK=true
 
 #install the newest REXRAY on agents and swap out the old one in the DCOS installation
 if [[ $ROLE != "master" ]]; then
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
 #find out the rexray location
 REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
 LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
@@ -735,9 +742,61 @@ EOF
 
 systemctl restart dcos-rexray
 systemctl status dcos-rexray #show running version
-EOF2
-fi
 
+#format volumes/disks
+echo "** INFO: Formatting volume(s): "$CEPH_DISKS" for use with Ceph..."
+# just a name for the script below.
+CEPH_FDISK=ceph_fdisk_headless.sh 
+# Format disks as XFS
+cat > ./$CEPH_FDISK << EOF
+#!/bin/sh
+hdd="$CEPH_DISKS"
+EOF
+cat >> ./$CEPH_FDISK << 'EOF'
+for i in $hdd;do
+echo "n
+p
+1
+
+
+w
+"|fdisk $i;mkfs.xfs -f $i;done
+EOF
+chmod +x ./$CEPH_FDISK
+./$CEPH_FDISK && rm -f $CEPH_FDISK
+
+#mount the ceph disks/volumes
+# loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
+WORDS=($CEPH_DISKS)
+COUNT=${#WORDS[@]}
+for  ((i=0; i<COUNT; i++)); do
+  mkdir -p /dcos/volume$i
+  #i-th word in string
+  DISK=$( echo $CEPH_DISKS | cut -d " " -f $(($i+1)) )
+  #mount the $DISK as /dcos/volume$i
+  mount $DISK /dcos/volume$i
+  #add $DISK to /etc/fstab for automatic re-mounting on reboot
+  echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
+done
+
+#display correct progress
+echo "** INFO: Formatting done:"
+mount | grep "/dcos/volume"
+
+#restart mesos slave
+echo "** INFO: Restarting mesos slave process to add new volumes... "
+systemctl stop dcos-mesos-slave
+rm -f /var/lib/dcos/mesos-resources
+rm -f /var/lib/mesos/slave/meta/slaves/latest
+/opt/mesosphere/bin/make_disk_resources.py /var/lib/dcos/mesos-resources
+systemctl start dcos-mesos-slave
+echo "** INFO: Done. New Volumes added to Mesos: "
+cat /var/lib/dcos/mesos-resources | grep volume
+
+fi
+#if role != Master (install Ceph)
+
+EOF2
 # $$ end of node installer
 #################################################################
 

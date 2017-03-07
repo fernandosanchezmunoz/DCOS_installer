@@ -5,16 +5,20 @@
 #- a working Ceph DC/OS service
 #- jq
 
+#find out serve directory location
+#assume we're installed in ~/.DCOS_install
+DCOS_INSTALL_PATH="/root/DCOS_install"
+SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+CEPH_DISKS="/dev/xvdb"
+#configuration paths
 CEPH_CONF_PATH="/etc/ceph"
 CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
 CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
 CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
 
-#find out serve directory location
-#assume we're installed in ~/.DCOS_install
-DCOS_INSTALL_PATH="/root/DCOS_install"
-SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
 
 #pretty colours
 RED='\033[0;31m'
@@ -47,16 +51,11 @@ echo "** DEBUG: Secrets is: "$SECRETS
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
 #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
-export SECRETS=$SECRETS  
-export CEPH_CONF_PATH="/etc/ceph"
-export CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
-export CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
-export CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
-
+export SECRETS=$SECRETS
+export CEPH_CONF=$CEPH_CONF
 EOF2
 
 sudo cat >> $CEPH_INSTALLER  << 'EOF2' #with ticks -- rest of variables kept literal to translate on agents
-
 #install jq
 wget http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
@@ -124,10 +123,10 @@ EOF2
 echo -e "** DEBUG: cp $CEPH_INSTALLER $SERVE_PATH..."
 cp $CEPH_INSTALLER $SERVE_PATH
 #copy ceph.conf and keyrings to serve
-cp $CEPH_CONF $SERVE_PATH
-cp $CEPH_CONF $DCOS_INSTALL_PATH #for reference and manual use
-cp $CEPH_MON_KEYRING $SERVE_PATH
-cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
+cp $CEPH_CONF $SERVE_PATH$(basename $CEPH_CONF)
+cp $CEPH_CONF $DCOS_INSTALL_PATH$(basename $CEPH_CONF) #for reference and manual use
+cp $CEPH_MON_KEYRING $SERVE_PATH$(basename $CEPH_MON_KEYRING)
+cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH$(basename $CEPH_CLIENT_ADMIN_KEYRING)
 
 #print message to copy&paste in the agents
 #serve address
