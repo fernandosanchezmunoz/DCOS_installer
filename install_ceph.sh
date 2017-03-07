@@ -42,13 +42,12 @@ SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
 SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
 echo "** DEBUG: Secrets is: "$SECRETS
 
-
 #ceph_installer.sh
 ######################
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
-
-export SECRETS=$SECRETS   #EOF2 without ticks - translate $SECRET and variables when running on bootstrap
+#EOF2 without ticks - translate $SECRET and variables when running on bootstrap
+export SECRETS=$SECRETS  
 export CEPH_CONF_PATH="/etc/ceph"
 export CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
 export CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
@@ -126,6 +125,7 @@ echo -e "** DEBUG: cp $CEPH_INSTALLER $SERVE_PATH..."
 cp $CEPH_INSTALLER $SERVE_PATH
 #copy ceph.conf and keyrings to serve
 cp $CEPH_CONF $SERVE_PATH
+cp $CEPH_CONF $DCOS_INSTALL_PATH #for reference and manual use
 cp $CEPH_MON_KEYRING $SERVE_PATH
 cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
