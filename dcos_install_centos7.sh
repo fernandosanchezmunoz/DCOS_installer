@@ -402,7 +402,6 @@ CEPH_DISKS=$CEPH_DISKS
 BOOTSTRAP_IP=$BOOTSTRAP_IP
 BOOTSTRAP_PORT=$BOOTSTRAP_PORT
 WORKING_DIR=$WORKING_DIR
-BOOTSTRAP_FILE=$BOOTSTRAP_FILE
 NODE_INSTALLER=$NODE_INSTALLER
 CERT_NAME=$CERT_NAME
 CA_NAME=$CA_NAME
@@ -412,6 +411,10 @@ INSTALL_ELK=$INSTALL_ELK
 ELK_HOSTNAME=$ELK_HOSTNAME
 ELK_PORT=$ELK_PORT
 FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
+ELK_CERT_NAME=$ELK_CERT_NAME
+ELK_KEY_NAME=$ELK_KEY_NAME
+ELK_PEM_NAME=$ELK_PEM_NAME
+ELK_CA_NAME=$ELK_CA_NAME
 
 EOF2
 
@@ -554,9 +557,6 @@ if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]];
   echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
   read -p "** Press Enter to exit..."
   exit 1
-else
-  #run the installer
-  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
 fi
 
 echo "** Running installer as $ROLE..."
