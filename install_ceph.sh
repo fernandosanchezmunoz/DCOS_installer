@@ -41,7 +41,7 @@ chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
 git clone https://github.com/id/zookeeper-el7-rpm
 cd zookeeper-el7-rpm/
-sudo yum install make rpmdevtools
+sudo yum install -y make rpmdevtools
 make rpm
 yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm
 cp /usr/local/bin/zkcli /usr/bin
@@ -145,9 +145,9 @@ echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO
 echo -e ""
 echo -e "${RED}sudo su"
 echo -e "cd"
-echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF) $CEPH_CONF"    
-echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING) $CEPH_MON_KEYRING"
-echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING) $CEPH_CLIENT_ADMIN_KEYRING"
-echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
+echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF) $CEPH_CONF"    
+echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING) $CEPH_MON_KEYRING"
+echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING) $CEPH_CLIENT_ADMIN_KEYRING"
+echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
 echo -e "${BLUE}** Done${NC}."
