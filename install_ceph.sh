@@ -13,7 +13,7 @@ CEPH_INSTALLER="ceph_installer.sh"
 #find out serve directory location
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
-SERVE_PATH=$DCOS_INSTALL_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
+SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
 CEPH_INSTALLER=$SERVE_PATH"/"$CEPH_INSTALLER
 
 #pretty colours
