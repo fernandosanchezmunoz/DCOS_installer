@@ -19,20 +19,22 @@ CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
 CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
 
+#pretty colours
+RED='\033[0;31m'
+BLUE='\033[1;34m'
+NC='\033[0m' # No Color
+
+
+
 #install CEPH on DC/OS
 dcos auth login
 echo "** INFO: Installing ceph on mesos..."
 dcos package install --yes ceph
 
 until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
-    printf '**INFO: Waiting for Ceph on DC/OS to be available...'
-    sleep 5
+    printf '** INFO: Waiting for Ceph on DC/OS to be available...'
+    sleep 2
 done
-
-#pretty colours
-RED='\033[0;31m'
-BLUE='\033[1;34m'
-NC='\033[0m' # No Color
 
 #depencencies
 #jq
