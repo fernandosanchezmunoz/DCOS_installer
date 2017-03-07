@@ -38,7 +38,7 @@ done
 
 #depencencies
 #jq
-curl -O http://stedolan.github.io/jq/download/linux64/jq
+curl -s -O http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
 cp jq /usr/bin
 #zkCLi
