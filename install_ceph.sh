@@ -80,7 +80,7 @@ echo "**DEBUG: MONITORS: "$MONITORS
 
 cat <<-EOF > $CEPH_CONF
 [global]
-fsid = $(echo "$SECRETS" | jq .fsid)
+fsid = $(echo $SECRETS | jq .fsid)
 mon host = "${MONITORS::-1}"
 auth cluster required = cephx
 auth service required = cephx
