@@ -14,7 +14,7 @@ CEPH_INSTALLER="ceph_installer.sh"
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
-CEPH_INSTALLER=$SERVE_PATH"/"$CEPH_INSTALLER
+
 
 #pretty colours
 RED='\033[0;31m'
@@ -100,7 +100,8 @@ yum install -y ceph
 
 EOF2
 
-
+#copy installer to serve directory
+cp CEPH_INSTALLER $SERVE_PATH
 
 #print message to copy&paste in the agents
 
