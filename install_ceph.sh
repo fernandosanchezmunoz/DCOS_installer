@@ -21,11 +21,30 @@ RED='\033[0;31m'
 BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
+#depencencies
+#jq
+wget http://stedolan.github.io/jq/download/linux64/jq
+chmod +x ./jq
+cp jq /usr/bin
+#zkCLi
+mkdir -p /opt/zookeeper
+chown nobody:nobody /opt/zookeeper
+cd /opt/zookeeper
+git clone https://github.com/id/zookeeper-el7-rpm
+cd zookeeper-el7-rpm/
+sudo yum install make rpmdevtools
+make rpm
+yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm
+cp /usr/local/bin/zkcli /usr/bin
+
 #get SECRETS from Zookeeper
-SECRETS="FAKESECRET" #"$(curl -s leader.mesos)"  zkcli.sh 
+SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
+SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
+echo "** DEBUG: Secrets is: "$SECRETS
 
 #generate ceph_installer.sh with keys
 sudo cat >> $CEPH_INSTALLER  << EOF2
+
 export SECRETS=$SECRETS
 # example: export SECRETS='{"fsid":"bc74ca0d-ff9a-480d-ac18-ccad34d144d4","adminRing":"AQBAxDxYFv/CBRAALIZk22t8X3q3WS8+cHuoKQ==","monRing":"AQBAxDxY9o4BDBAA3hv1p/SJiHhwe5KwWOddug==","mdsRing":"AQBAxDxYa2YCDBAAXZjSsMWBNkdaKtjiXmNVig==","osdRing":"AQBAxDxYeiYDDBAANaBgkJi98oA1chOk4tvXUQ==","rgwRing":"AQBAxDxY4RAEDBAAV5APHwy6clkNAON8rwSP2w=="}'
 EOF2
@@ -94,7 +113,6 @@ yum install -y ceph
 /bin/python /bin/ceph -s
 
 EOF2
-#ceph_installer.sh
 ######################
 #end of ceph installer
 
