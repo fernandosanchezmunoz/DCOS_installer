@@ -394,6 +394,7 @@ sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 # Author: Fernando Sanchez (fernando at mesosphere.com)
 #
 
+#imported variables from parent script
 CEPH_DISKS=$CEPH_DISKS
 BOOTSTRAP_IP=$BOOTSTRAP_IP
 BOOTSTRAP_PORT=$BOOTSTRAP_PORT
@@ -404,13 +405,16 @@ CERT_NAME=$CERT_NAME
 CA_NAME=$CA_NAME
 KEY_NAME=$KEY_NAME
 PEM_NAME=$PEM_NAME
+INSTALL_ELK=$INSTALL_ELK
 ELK_HOSTNAME=$ELK_HOSTNAME
 ELK_PORT=$ELK_PORT
 FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
+
 EOF2
 
 # $$ 'EOF2' with ticks - "leave variable names as they are here"
 sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
 RED='\033[0;31m'
