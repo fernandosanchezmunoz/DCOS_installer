@@ -746,6 +746,9 @@ libstorage:
   service: rbd
 EOF
 
+#copy to libstorage config
+cp /etc/rexray/config.yml /etc/libstorage/config.yml
+
 systemctl restart dcos-rexray
 systemctl status dcos-rexray #show running version
 
