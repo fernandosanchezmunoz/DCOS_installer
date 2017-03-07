@@ -118,15 +118,15 @@ EOF
 
 #generate ceph_installer.sh to be used in agents
 #######################################
-sudo tee $CEPH_INSTALLER <<-EOF2
+cat <<-EOF > $CEPH_INSTALLER 
 
 #install ceph
 rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph ceph
 
 #get config and keys from bootstrap node, place in the right directory
-curl -s -o CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
-curl -s -o CEPH_MON_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING)
-curl -s -o CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING)
+curl -s -o $CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
+curl -s -o $CEPH_MON_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_MON_KEYRING)
+curl -s -o $CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CLIENT_ADMIN_KEYRING)
 
 #check correct functioning
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
@@ -136,7 +136,7 @@ curl -s -o CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(base
 #display finished message
 echo -e "${NC}Ceph is available at http://PUBLIC_NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 
-EOF2
+EOF
 ######################
 #end of ceph installer
 
