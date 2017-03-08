@@ -24,13 +24,12 @@ RED='\033[0;31m'
 BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
-
-
-#install CEPH on DC/OS
+#install CEPH on DC/OS cluster
 dcos auth login
 echo "** INFO: Installing ceph on mesos..."
 dcos package install --yes ceph
 
+#wait until Ceph is available and healthy
 until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
     echo "** INFO: Waiting for Ceph on DC/OS to be available..."
     sleep 2
