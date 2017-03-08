@@ -1,3 +1,15 @@
+#do not continue until Ceph is configured and monitors are reachable
+while true; do
+read -p "Press ENTER ONLY WHEN YOU HAVE CONFIGURED MONITORS AND OSDs ACCORDING TO THE LINK ABOVE AND THEY'RE ALL WORKING."
+#check that monitors are up
+if ping -c 1 leader.mesos &> /dev/null
+then
+  echo -e "** INFO: DC/OS leader ready."
+  break
+else 
+  echo -e "** ERROR: DC/OS leaderis still unreachable. Please check your configuration."
+fi
+done
 dcos auth login
 
 dcos package install --yes --cli dcos-enterprise-cli
