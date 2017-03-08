@@ -156,7 +156,7 @@ curl -s -o $CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(bas
 /bin/python /bin/ceph -s
 
 #display finished message
-echo -e "${NC}Ceph is available at http://PUBLIC_NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
+echo -e "${NC}Done. ${RED}Ceph${NC} is configured on this node."
 
 EOF
 ######################
