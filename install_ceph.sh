@@ -36,6 +36,21 @@ until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); 
     sleep 2
 done
 
+echo -e "${NC}Ceph is available at http://PUBLIC-NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in:"
+echo -e "${BLUE}**https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
+
+#do not continue until Ceph is configured and monitors are reachable
+while true; do
+read -p "Press ENTER ONLY WHEN YOU HAVE CONFIGURED MONITORS AND OSDs ACCORDING TO THE LINK ABOVE AND THEY'RE ALL WORKING."
+#check that monitors are up
+if ping -c 1 mon.ceph.mesos &> /dev/null
+then
+  break
+else 
+  echo -e "Ceph monitors are still unreachable. Please check your configuration."
+fi
+done
+
 #depencencies
 #jq
 curl -s -O http://stedolan.github.io/jq/download/linux64/jq
@@ -161,8 +176,6 @@ echo -e "${RED}sudo su"
 echo -e "cd"
 echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
-echo -e "${NC}Ceph is available at http://PUBLIC-NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in:"
-echo -e "${BLUE}**https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 echo -e "Done${NC}."
 
 #remove this installer along with the secret
