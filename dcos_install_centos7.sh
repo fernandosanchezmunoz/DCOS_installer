@@ -798,6 +798,7 @@ systemctl stop dcos-mesos-slave
 rm -f /var/lib/dcos/mesos-resources
 rm -f /var/lib/mesos/slave/meta/slaves/latest
 /opt/mesosphere/bin/make_disk_resources.py /var/lib/dcos/mesos-resources
+sleep 10 #wait to ensure mesos-slave service is there
 systemctl start dcos-mesos-slave
 echo "** INFO: Done. New Volumes added to Mesos: "
 cat /var/lib/dcos/mesos-resources | grep volume
