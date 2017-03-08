@@ -53,7 +53,7 @@ if ping -c 1 mon.ceph.mesos &> /dev/null
 then
   break
 else 
-  echo -e "Ceph monitors are still unreachable. Please check your configuration."
+  echo -e "Ceph monitors are still unreachable. Please check your configuration and the documentation link above and try again."
 fi
 done
 
