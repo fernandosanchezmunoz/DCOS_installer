@@ -11,12 +11,18 @@ This installer is a simplified and scripted version of the **[official DC/OS Adv
 
 ## Usage
 
-Run the script in the node that will be used as bootstrap by copying and pasting the `curl` command below. Optionally, edit the first section according to the desired cluster configuration. This includes:
+Run the script in the node that will be used as bootstrap by copying and pasting the `curl` command below. Enter the IP address(es) of the master node(s), then follow the menu to select your installation options such as:
+
+- Cluster name
+- Login/password of the default user
+- DNS and NTP servers to be used
+- Additional features such as automatic logging through ELK, or persistent software-defined storage with Ceph.
+
+Optionally, to access other configuration options, edit the first section of the script according to the desired cluster configuration. This includes:
 
 - Adding the adequate *download link for the desired version* (default: latest **Open DC/OS testing** version available)
-- Modifying the default bootstrap username/password (default: **bootstrapuser/deleteme**).
-- Adjusting the security level (default: **permissive**).
-- Optionally, adjust the cluster name or the directory for the installer to use as storage.
+- Adjusting the security level (default: **disabled**).
+- Optionally, adjust other details such as the directory for the installer to use as base storage for the installation.
 
 The script requires to have open connectivity for the ports required for the download (configurable in the script) and for DC/OS to work properly.
 The script assumes some default values. If you wish to modify these parameters, edit the first section of the script and re-run.
