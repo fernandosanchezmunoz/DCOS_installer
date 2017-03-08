@@ -47,3 +47,5 @@ bash dcos_install_centos7.sh
 The script will provide a command during the installation process pointing to the node installer script in the bootstrap node, to be copied & pasted in the cluster nodes with the following format:
 
 ```curl -O http://BOOTSTRAP_NODE_IP:PORT/node_installer.sh && sudo bash node_installer.sh [ROLE]```
+
+After installation has completed, and depending on the options selected in the menu, the script may provide additional commands to install other features, such as the Marathon-LB load balancer, or the Ceph distributed storage solution.
