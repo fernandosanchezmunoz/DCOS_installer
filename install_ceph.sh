@@ -63,7 +63,7 @@ done
 echo "** INFO: Installing JQ..."
 curl -s -O http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
-yes | cp -f jq /usr/bin
+yes | cp -f jq /usr/bin > /dev/null 2>&1
 
 #zkCLi
 echo "** INFO: Installing zkCli..."
