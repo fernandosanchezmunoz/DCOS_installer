@@ -996,6 +996,7 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e "** ${BLUE}SUCCESS${NC}. Bootstrap node installed."
   echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL DC/OS:"
   echo -e ""
+  echo -e ""
   echo -e "${RED}#####################################################################################################"  
   echo -e "sudo su"
   echo -e "cd"
@@ -1005,7 +1006,7 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
   if [ "$INSTALL_ELK" == true ]; then
-   echo -e "** ${BLUE}Kibana${NC} is available at http://"$BOOTSTRAP_IP":5601"
+   echo -e "** ${BLUE}Kibana${NC} is available and configured for logging of the cluster at http://"$BOOTSTRAP_IP":5601"
   fi
   echo -e "** ${BLUE}Done${NC}."
 else
