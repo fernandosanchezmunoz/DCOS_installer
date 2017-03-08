@@ -41,7 +41,6 @@ TEST_FILE=$WORKING_DIR/genconf/serve/dcos_install.sh
 MASTER_IP_FILE=$WORKING_DIR/.masterip
 UNPACKED_INSTALLER_FILE=$WORKING_DIR/"dcos-genconf.*.tar"
 NGINX_NAME=dcos_int_nginx
-REXRAY_CONFIG_FILE="rexray.yaml"  #relative to /genconf. Currently only Amazon EBS supported
 CERT_NAME=domain.crt
 KEY_NAME=domain.key
 PEM_NAME=domain.pem
@@ -286,17 +285,6 @@ else
 fi
 PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 
-#generate Rex-ray configuration file for external persistent volumes with Ceph RBD
-####################################################################################
-echo "** Generating external persistent volumes configuration file for Ceph RBD.."
-
-cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
-rexray:
-#  loglevel: debug
-libstorage:
-  service: rbd
-EOF
-
 #Generate configuration files
 #################################################################
 echo "** Generating configuration file..."
@@ -314,8 +302,6 @@ exhibitor_storage_backend: static
 master_discovery: static
 telemetry_enabled: $TELEMETRY
 security: $SECURITY_LEVEL
-rexray_config_method: file
-rexray_config_filename: $REXRAY_CONFIG_FILE
 master_list:
 $([[ $MASTER_1 != "" ]] && echo "- $MASTER_1")  \
 $([[ $MASTER_2 != "" ]] && echo "
@@ -324,6 +310,14 @@ $([[ $MASTER_3 != "" ]] && echo "
 - $MASTER_3")
 resolvers:
 - $DNS_SERVER
+rexray_config:
+  rexray:
+  #  loglevel: debug
+  modules:
+    default-admin:
+      host: tcp://127.0.0.1:61003
+  libstorage:
+    service: rbd
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
