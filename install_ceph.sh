@@ -32,7 +32,7 @@ echo "** INFO: Installing ceph on mesos..."
 dcos package install --yes ceph
 
 until $(curl -s --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
-    printf '** INFO: Waiting for Ceph on DC/OS to be available...'
+    echo '** INFO: Waiting for Ceph on DC/OS to be available...'
     sleep 2
 done
 
@@ -122,6 +122,8 @@ EOF
 BOOTSTRAP_PORT=80
 BOOTSTRAP_IP=$(/usr/sbin/ip route get 8.8.8.8| grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
 
+sleep 1
+
 #generate ceph_installer.sh to be used in agents
 #######################################
 cat <<-EOF > $CEPH_INSTALLER 
@@ -159,7 +161,7 @@ echo -e "${RED}sudo su"
 echo -e "cd"
 echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
-echo -e "${NC}Ceph is available at http://$PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
+echo -e "${NC}Ceph is available at http://PUBLIC_NODE_IP:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph"
 echo -e "${BLUE}** Done${NC}."
 
 #remove this installer along with the secret
