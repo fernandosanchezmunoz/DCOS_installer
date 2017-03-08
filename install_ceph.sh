@@ -92,9 +92,6 @@ rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release ce
 #ceph.conf
 export HOST_NETWORK=0.0.0.0/0 
 export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
-echo "**DEBUG: SECRETS: "$SECRETS
-echo "**DEBUG: MONITORS: "$MONITORS
-echo "**DEBUG: CEPH_CONF: "$CEPH_CONF
 
 sudo cat > $CEPH_CONF << EOF
 [global]
