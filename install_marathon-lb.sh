@@ -1,6 +1,6 @@
 #do not continue until Ceph is configured and monitors are reachable
 while true; do
-read -p "Press ENTER ONLY WHEN YOU HAVE CONFIGURED MONITORS AND OSDs ACCORDING TO THE LINK ABOVE AND THEY'RE ALL WORKING."
+read -p "Press ENTER only when you have completed the cluster install and MASTER nodes are up."
 #check that monitors are up
 if ping -c 1 leader.mesos &> /dev/null
 then
