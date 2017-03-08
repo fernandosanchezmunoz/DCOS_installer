@@ -31,7 +31,7 @@ dcos auth login
 echo "** INFO: Installing ceph on mesos..."
 dcos package install --yes ceph
 
-until $(curl -s --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
+until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
     echo '** INFO: Waiting for Ceph on DC/OS to be available...'
     sleep 2
 done
