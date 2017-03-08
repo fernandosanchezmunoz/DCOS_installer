@@ -801,7 +801,12 @@ rm -f /var/lib/mesos/slave/meta/slaves/latest
 sleep 10 #wait to ensure mesos-slave service is there
 systemctl start dcos-mesos-slave
 echo "** INFO: Done. New Volumes added to Mesos: "
+
+sleep 3
+systemctl restart dcos-mesos-slave
 cat /var/lib/dcos/mesos-resources | grep volume
+
+
 
 fi
 #if role != Master (install Ceph)
