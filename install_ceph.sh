@@ -31,9 +31,14 @@ dcos package install --yes ceph
 
 #wait until Ceph is available and healthy
 #until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
-until $(ping -c 1 ceph.mesos); do
-    echo "** INFO: Waiting for Ceph on DC/OS to be available..."
-    sleep 2
+while true; do
+ ping -c 1 ceph.mesos
+ if [ $? == 0 ]; then
+    echo "** INFO: Ceph on DC/OS is available. Continuing install..."
+    break
+ else
+    echo "** INFO: Waiting for Ceph on DC/OS to be available..."	
+ fi
 done
 
 echo -e "${NC}Ceph is available at http://PUBLIC-NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in:"
