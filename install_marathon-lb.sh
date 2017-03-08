@@ -7,7 +7,7 @@ then
   echo -e "** INFO: DC/OS leader ready."
   break
 else 
-  echo -e "** ERROR: DC/OS leaderis still unreachable. Please check your configuration."
+  echo -e "** ERROR: DC/OS leader is still unreachable. Please check your configuration."
 fi
 done
 dcos auth login
