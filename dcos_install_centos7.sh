@@ -23,6 +23,7 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true
 INSTALL_ELK=false
+INSTALL_CEPH=false
 #Volume(s) to be used by Ceph
 #separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
 CEPH_DISKS="/dev/xvdb"
@@ -120,6 +121,8 @@ echo "5) Installation directory:             "$WORKING_DIR
 echo "6) NTP server:                         "$NTP_SERVER
 echo "7) DNS server:                         "$DNS_SERVER
 echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
+echo "9) Pre-install Ceph on agents:         "$INSTALL_CEPH 
+echo "0) Volumes to be configured for Ceph:  "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -150,6 +153,10 @@ echo "**************************************************************************
             [7]) read -p "Enter new value for DNS server: " DNS_SERVER
                  ;;
             [8]) if [ "$INSTALL_ELK" == false ]; then INSTALL_ELK=true; else INSTALL_ELK=false; fi
+                 ;;
+            [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
+                 ;;
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
                  ;;
               *) echo "** Invalid input. Please choose an option [1-8]"
                  ;;
@@ -310,14 +317,15 @@ $([[ $MASTER_3 != "" ]] && echo "
 - $MASTER_3")
 resolvers:
 - $DNS_SERVER
-rexray_config:
+$([ $INSTALL_CEPH == true ] && echo \
+"rexray_config:
   rexray:
   #  loglevel: debug
   modules:
     default-admin:
       host: tcp://127.0.0.1:61003
   libstorage:
-    service: rbd
+    service: rbd")
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -392,7 +400,6 @@ sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-EOF2
 #
 
 #imported variables from parent script
-CEPH_DISKS=$CEPH_DISKS
 BOOTSTRAP_IP=$BOOTSTRAP_IP
 BOOTSTRAP_PORT=$BOOTSTRAP_PORT
 WORKING_DIR=$WORKING_DIR
@@ -409,7 +416,8 @@ ELK_CERT_NAME=$ELK_CERT_NAME
 ELK_KEY_NAME=$ELK_KEY_NAME
 ELK_PEM_NAME=$ELK_PEM_NAME
 ELK_CA_NAME=$ELK_CA_NAME
-
+INSTALL_CEPH=$INSTALL_CEPH
+CEPH_DISKS=$CEPH_DISKS
 EOF2
 
 # $$ 'EOF2' with ticks - "leave variable names as they are here"
@@ -717,7 +725,10 @@ sudo chkconfig filebeat on
 fi
 #if INSTALL_ELK=true
 
-#install the newest REXRAY on agents and swap out the old one in the DCOS installation
+
+#Ceph: install the newest REXRAY on agents and swap out the one in the DCOS installation
+if [ "$INSTALL_CEPH" == true ]; then 
+
 if [[ $ROLE == "slave" ]]; then
 echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
 #find out the rexray location
@@ -733,6 +744,7 @@ mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 
 #add the configuration
+#TODO: test if the configuration is applied by DC/OS installer with upgrade
 cat > /etc/rexray/config.yml << EOF
 rexray:
 #  loglevel: debug
@@ -800,11 +812,10 @@ sleep 3
 systemctl restart dcos-mesos-slave
 cat /var/lib/dcos/mesos-resources | grep volume
 
-
-
 fi
-#if role != Master (install Ceph)
-
+#if role == slave (install Ceph)
+fi
+#if (INSTALL_CEPH==true)
 EOF2
 # $$ end of node installer
 #################################################################
@@ -1012,5 +1023,7 @@ fi
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} run: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_marathon-lb.sh)${NC}"
 
+if [ "$INSTALL_CEPH" == true ]; then 
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${Blue}Ceph{NC} run: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_ceph.sh)${NC}"
+fi
