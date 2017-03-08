@@ -37,7 +37,8 @@ while true; do
     echo "** INFO: Ceph on DC/OS is available. Continuing install..."
     break
  else
-    echo "** INFO: Waiting for Ceph on DC/OS to be available..."	
+    echo "** INFO: Waiting for Ceph on DC/OS to be available..."
+    sleep 2
  fi
 done
 
