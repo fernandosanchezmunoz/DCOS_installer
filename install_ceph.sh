@@ -58,11 +58,15 @@ fi
 done
 
 #depencencies
+
 #jq
+echo "** INFO: Installing JQ..."
 curl -s -O http://stedolan.github.io/jq/download/linux64/jq
 chmod +x ./jq
-cp -f jq /usr/bin
+yes | cp -f jq /usr/bin
+
 #zkCLi
+echo "** INFO: Installing zkCli..."
 mkdir -p /opt/zookeeper
 chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
@@ -74,6 +78,7 @@ yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm > /dev/null 2>&1
 cp /usr/local/bin/zkcli /usr/bin
 
 #get SECRETS from Zookeeper
+echo "** INFO: Getting Ceph keys from Zookeeper..."
 SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
 SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
 
@@ -82,12 +87,14 @@ if [[ ${SECRETS} != *"fsid"* ]]; then
 	exit 1
 fi
 
+#install ceph on bootstrap for testing
+echo "** INFO: Installing Ceph..."
+rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph && yum install -y ceph
+
 #configure ceph
+echo "** INFO: Configuring Ceph..."
 mkdir -p $CEPH_CONF_PATH
 cd $CEPH_CONF_PATH
-
-#install ceph on bootstrap for testing
-rpm --rebuilddb && yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph && yum install -y ceph
 
 #generate Ceph configuration files for the cluster on bootstrap
 #ceph.conf
@@ -131,6 +138,7 @@ cat <<-EOF > $CEPH_CLIENT_ADMIN_KEYRING
 EOF
 
 #check correct functioning
+echo "** INFO: Testing Ceph..."
 /bin/python /bin/ceph mon getmap -o /etc/ceph/monmap-ceph
 #expected output if Ceph is running: "got monmap epoch 3"
 
@@ -144,6 +152,7 @@ sleep 1
 
 #generate ceph_installer.sh to be used in agents
 #######################################
+echo "** INFO: Generating Ceph installer for agents..."
 cat <<-EOF > $CEPH_INSTALLER 
 
 #install ceph
@@ -175,14 +184,14 @@ cp $CEPH_CONF $SERVE_PATH
 cp $CEPH_MON_KEYRING $SERVE_PATH
 cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
-
+echo "** INFO: Complete..."
 echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL CEPH:"
 echo -e ""
 echo -e "${RED}sudo su"
 echo -e "cd"
 echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
-echo -e "Done${NC}."
+echo -e "${NC}Done."
 
 #remove this installer along with the secret
 rm -f $CEPH_INSTALLER
