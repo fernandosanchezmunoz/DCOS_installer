@@ -23,6 +23,10 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true
 INSTALL_ELK=false
+INSTALL_CEPH=false
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+CEPH_DISKS="/dev/xvdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
@@ -38,7 +42,6 @@ TEST_FILE=$WORKING_DIR/genconf/serve/dcos_install.sh
 MASTER_IP_FILE=$WORKING_DIR/.masterip
 UNPACKED_INSTALLER_FILE=$WORKING_DIR/"dcos-genconf.*.tar"
 NGINX_NAME=dcos_int_nginx
-REXRAY_CONFIG_FILE="rexray.yaml"  #relative to /genconf. Currently only Amazon EBS supported
 CERT_NAME=domain.crt
 KEY_NAME=domain.key
 PEM_NAME=domain.pem
@@ -118,6 +121,8 @@ echo "5) Installation directory:             "$WORKING_DIR
 echo "6) NTP server:                         "$NTP_SERVER
 echo "7) DNS server:                         "$DNS_SERVER
 echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
+echo "9) Ceph on agents (experimental):      "$INSTALL_CEPH 
+echo "0) Volumes for Ceph (experimental):    "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -131,7 +136,7 @@ echo "**************************************************************************
           echo "** Agent installation command saved in $WORKING_DIR/$COMMAND_FILE for future use."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-8]: " PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-0]: " PARAMETER
           case $PARAMETER in
             [1]) read -p "Enter new value for Master node private IP(s): " MASTER_IP
                  ;;
@@ -146,10 +151,14 @@ echo "**************************************************************************
             [6]) read -p "Enter new value for NTP server: " NTP_SERVER
                  ;;
             [7]) read -p "Enter new value for DNS server: " DNS_SERVER
-                 ;;  
+                 ;;
             [8]) if [ "$INSTALL_ELK" == false ]; then INSTALL_ELK=true; else INSTALL_ELK=false; fi
                  ;;
-              *) echo "** Invalid input. Please choose an option [1-8]"
+            [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
+                 ;;
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
+                 ;;
+              *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
           esac
           ;;
@@ -283,20 +292,6 @@ else
 fi
 PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 
-#generate Rex-ray configuration file for external persistent volumes with Amazon EBS
-####################################################################################
-echo "** Generating external persistent volumes configuration file for Amazon EBS..."
-
-cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
-rexray:
-  loglevel: info
-  storageDrivers:
-    - ec2
-  volume:
-    unmount:
-      ignoreusedcount: true
-EOF
-
 #Generate configuration files
 #################################################################
 echo "** Generating configuration file..."
@@ -314,8 +309,6 @@ exhibitor_storage_backend: static
 master_discovery: static
 telemetry_enabled: $TELEMETRY
 security: $SECURITY_LEVEL
-rexray_config_method: file
-rexray_config_filename: $REXRAY_CONFIG_FILE
 master_list:
 $([[ $MASTER_1 != "" ]] && echo "- $MASTER_1")  \
 $([[ $MASTER_2 != "" ]] && echo "
@@ -324,6 +317,15 @@ $([[ $MASTER_3 != "" ]] && echo "
 - $MASTER_3")
 resolvers:
 - $DNS_SERVER
+$([ $INSTALL_CEPH == true ] && echo \
+"rexray_config:
+  rexray:
+  #  loglevel: debug #not needed
+  #modules:          #from doc but problematic
+  #  default-admin:
+  #    host: tcp://127.0.0.1:61003
+  libstorage:
+    service: rbd")
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -352,7 +354,7 @@ echo "** Running local $NGINX_NAME container to serve installation files..."
 sudo docker rm -f $NGINX_NAME
 /usr/bin/docker run -d -p $BOOTSTRAP_PORT:80 -v $WORKING_DIR/genconf/serve:/usr/share/nginx/html:ro \
         --name=$NGINX_NAME nginx
-sleep 2        
+sleep 2
 if [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) == "false" ]; then
   echo -e "** Running local $NGINX_NAME container ${RED}FAILED${NC}. Exiting."
   exit 1
@@ -385,14 +387,41 @@ systemctl daemon-reload
 echo "** Generating agent launcher..."
 
 mkdir -p $WORKING_DIR/genconf/serve/
+
 # $$ start node installer
-# $$ 'EOF2' with ticks - "leave variable names as they are here"
-sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+# $$ EOF2 without ticks - "translate variables on execution" -- export variables from main script into agent
+
+sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-EOF2
+
 #!/bin/bash
 #
-# DC/OS Installer script for cluster nodes
+# Installer script for DC/OS cluster nodes
 # Author: Fernando Sanchez (fernando at mesosphere.com)
 #
+
+#imported variables from parent script
+BOOTSTRAP_IP=$BOOTSTRAP_IP
+BOOTSTRAP_PORT=$BOOTSTRAP_PORT
+WORKING_DIR=$WORKING_DIR
+NODE_INSTALLER=$NODE_INSTALLER
+CERT_NAME=$CERT_NAME
+CA_NAME=$CA_NAME
+KEY_NAME=$KEY_NAME
+PEM_NAME=$PEM_NAME
+INSTALL_ELK=$INSTALL_ELK
+ELK_HOSTNAME=$ELK_HOSTNAME
+ELK_PORT=$ELK_PORT
+FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
+ELK_CERT_NAME=$ELK_CERT_NAME
+ELK_KEY_NAME=$ELK_KEY_NAME
+ELK_PEM_NAME=$ELK_PEM_NAME
+ELK_CA_NAME=$ELK_CA_NAME
+INSTALL_CEPH=$INSTALL_CEPH
+CEPH_DISKS=$CEPH_DISKS
+EOF2
+
+# $$ 'EOF2' with ticks - "leave variable names as they are here"
+sudo tee -a $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2'
 
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
@@ -454,16 +483,12 @@ if [ ! -f $ROLE_FILE ]; then
 else
   ROLE=`cat $ROLE_FILE`
 fi
-EOF2
 
 #Update system
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 echo "** Updating system..."
 sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
-EOF2
 
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
-
+#download installer
 echo "** Downloading installer from $BOOTSTRAP_IP..."
 curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/dcos_install.sh
 
@@ -482,6 +507,11 @@ sed -i s/SELINUX=enforcing/SELINUX=permissive/g /etc/selinux/config
 setenforce 0
 
 echo "** Installing dependencies..."
+
+#install jq
+curl -O http://stedolan.github.io/jq/download/linux64/jq
+chmod +x ./jq
+yes | cp -rf jq /usr/bin
 
 #Docker with overlayfs
 echo 'overlay'\
@@ -521,10 +551,6 @@ sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
-
 #Ask for manual intervention if required for docker storage driver change to overlay.
 #####################################################################################
 if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
@@ -533,9 +559,6 @@ if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]];
   echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
   read -p "** Press Enter to exit..."
   exit 1
-else
-  #run the installer
-  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
 fi
 
 echo "** Running installer as $ROLE..."
@@ -554,22 +577,19 @@ fi
 #fix for Zeppelin -- add FQDN
 sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
-EOF2
-
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
-if [ "$INSTALL_ELK" = true ]; then 
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
+if [ "$INSTALL_ELK" = true ]; then
 
 echo "** Installing Filebeat (aka. logstash-forwarder) ... "
 
 #copy SSL certificate and key from bootstrap
 sudo mkdir -p /etc/pki/tls/certs
 sudo mkdir -p /etc/pki/tls/private
-curl -o /etc/pki/tls/certs/$ELK_CERT_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CERT_NAME 
-curl -o /etc/pki/tls/certs/$ELK_CA_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CA_NAME
-curl -o /etc/pki/tls/private/$ELK_KEY_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$KEY_NAME 
-curl -o /etc/pki/tls/certs/$ELK_PEM_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$PEM_NAME 
+curl -s -o /etc/pki/tls/certs/$ELK_CERT_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CERT_NAME
+curl -s -o /etc/pki/tls/certs/$ELK_CA_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$CA_NAME
+curl -s -o /etc/pki/tls/private/$ELK_KEY_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$KEY_NAME
+curl -s -o /etc/pki/tls/certs/$ELK_PEM_NAME http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$PEM_NAME
 
 #install filebeat
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.0.0-x86_64.rpm
@@ -578,7 +598,7 @@ sudo rpm -vi filebeat-5.0.0-x86_64.rpm
 #configure filebeat
 echo "** Configuring Filebeat (aka. logstash-forwarder) ..."
 sudo mv /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.BAK
-sudo tee /etc/filebeat/filebeat.yml <<-EOF 
+sudo tee /etc/filebeat/filebeat.yml <<-EOF
 filebeat.prospectors:
 - input_type: log
   paths:
@@ -596,19 +616,12 @@ output.elasticsearch:
 #  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 sudo mkdir -p /var/log/dcos
 #read the $ROLE variable inside the node, don't translate it while running this in the bootstrap
 if [[ $ROLE == "master" ]]; then
-EOF2
-
-#back to variable substitution when running in bootstrap
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
-sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -659,7 +672,7 @@ EOF
 else #if not master
 
 echo "** Creating service to parse DC/OS Agent logs into Filebeat ..."
-sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
+sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF
 [Unit]
 Description=DCOS journalctl parser to filebeat
 Wants=filebeat.service
@@ -697,7 +710,7 @@ ExecStartPre=/usr/bin/journalctl --vacuum-size=10M
 WantedBy=multi-user.target
 EOF
 
-fi 
+fi
 #if role=MASTER
 
 echo "** Installed Filebeat (aka. logstash-forwarder) ... "
@@ -709,10 +722,112 @@ sudo chkconfig $FILEBEAT_JOURNALCTL_SERVICE on
 sudo systemctl start filebeat
 sudo chkconfig filebeat on
 
-EOF2
-fi 
+fi
 #if INSTALL_ELK=true
 
+
+#Ceph: install the newest REXRAY on agents and swap out the one in the DCOS installation
+if [ "$INSTALL_CEPH" == true ]; then 
+
+if [[ $ROLE == "slave" ]]; then
+echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
+#find out the rexray location
+REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
+LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
+CMD=$(echo $LAST_LINE|awk '{print $1}')
+LOCATION=${CMD:10}
+#download the latest rexray
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
+#swap out the installed rexray for the downloaded one
+LOCATION_BAK=$LOCATION'.bak'
+mv $LOCATION $LOCATION_BAK
+mv /usr/bin/rexray $LOCATION
+
+#add the configuration
+#not needed: added into /etc/rexray/config.yml by installer from config.yaml
+
+#copy to libstorage config
+cp /etc/rexray/config.yml /etc/libstorage/config.yml
+
+systemctl restart dcos-rexray
+systemctl status dcos-rexray #show running version
+
+#format volumes/disks
+echo "** INFO: Formatting volume(s): "$CEPH_DISKS" for use with Ceph..."
+# just a name for the script below.
+CEPH_FDISK=ceph_fdisk_headless.sh 
+# Format disks as XFS
+cat > ./$CEPH_FDISK << EOF
+#!/bin/sh
+hdd="$CEPH_DISKS"
+EOF
+cat >> ./$CEPH_FDISK << 'EOF'
+for i in $hdd;do
+echo "n
+p
+1
+
+
+w
+"|fdisk $i;mkfs.xfs -f $i;done
+EOF
+chmod +x ./$CEPH_FDISK
+./$CEPH_FDISK && rm -f $CEPH_FDISK
+
+#mount the ceph disks/volumes
+# loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
+WORDS=($CEPH_DISKS)
+COUNT=${#WORDS[@]}
+for  ((i=0; i<COUNT; i++)); do
+  mkdir -p /dcos/volume$i
+  #i-th word in string
+  DISK=$( echo $CEPH_DISKS | cut -d " " -f $(($i+1)) )
+  #mount the $DISK as /dcos/volume$i
+  mount $DISK /dcos/volume$i
+  #add $DISK to /etc/fstab for automatic re-mounting on reboot
+  echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
+done
+
+#display correct progress
+echo "** INFO: Formatting done:"
+mount | grep "/dcos/volume"
+
+#restart mesos slave
+echo "** INFO: Restarting mesos slave process to add new volumes... "
+systemctl stop dcos-mesos-slave
+rm -f /var/lib/dcos/mesos-resources
+rm -f /var/lib/mesos/slave/meta/slaves/latest
+/opt/mesosphere/bin/make_disk_resources.py /var/lib/dcos/mesos-resources
+sleep 10 #wait to ensure mesos-slave service is there
+systemctl start dcos-mesos-slave
+echo "** INFO: Done. New Volumes added to Mesos: "
+
+sleep 3
+systemctl restart dcos-mesos-slave
+cat /var/lib/dcos/mesos-resources | grep volume
+
+fi
+#if role == slave (install Ceph)
+
+#restore rexray older version on slave_public to avoid errors
+if [[ $ROLE == "slave_public" ]]; then
+cat > /etc/rexray/config.yml << EOF
+rexray:
+  loglevel: info
+  modules:
+    default-admin:
+      host: tcp://127.0.0.1:61003
+  storageDrivers:
+  - ec2
+  volume:
+    unmount:
+      ignoreusedcount: true
+EOF
+fi
+#if slave_public
+fi
+#if (INSTALL_CEPH==true)
+EOF2
 # $$ end of node installer
 #################################################################
 
@@ -747,7 +862,7 @@ curl -fLsS --retry 20 -Y 100000 -y 60 $CLI_DOWNLOAD_URL -o dcos &&
  dcos config set core.dcos_url http://$MASTER_1 &&
  dcos config set core.ssl_verify false &&
  dcos
- 
+
  #Insert Mesos-DNS as resolver in bootstrap node to access *.mesos
  #################################################################
  mv -f /etc/resolv.conf /etc/resolv.conf.dcos #backup
@@ -785,7 +900,7 @@ fi
 # Install ELK on Bootstrap node:
 ################################################################################################################################
 ################################################################################################################################
-if [ "$INSTALL_ELK" = true ]; then 
+if [ "$INSTALL_ELK" = true ]; then
 echo -e "** Installing ${BLUE}ELK${NC}..."
 #Install Java 8
 echo "** Installing Java 8..."
@@ -795,7 +910,7 @@ rm -f jdk-8u*-linux-x64.rpm
 #Install elasticsearch
 echo "** Installing Elasticsearch..."
 sudo rpm --import http://packages.elastic.co/GPG-KEY-elasticsearch
-sudo tee /etc/yum.repos.d/elasticsearch.repo <<-EOF 
+sudo tee /etc/yum.repos.d/elasticsearch.repo <<-EOF
 [elasticsearch-2.x]
 name=Elasticsearch repository for 2.x packages
 baseurl=http://packages.elastic.co/elasticsearch/2.x/centos
@@ -892,17 +1007,19 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e "** ${BLUE}SUCCESS${NC}. Bootstrap node installed."
   echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL DC/OS:"
   echo -e ""
-  echo -e "${RED}sudo su"
+  echo -e ""
+  echo -e "${RED}#####################################################################################################"  
+  echo -e "sudo su"
   echo -e "cd"
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$NODE_INSTALLER && sudo bash $NODE_INSTALLER ${NC} [ROLE]"
+  echo -e "${RED}#####################################################################################################${NC}"  
   echo -e ""
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
   if [ "$INSTALL_ELK" == true ]; then
-   echo -e "** Kibana is available at http://"$BOOTSTRAP_IP":5601"
+   echo -e "** ${BLUE}Kibana${NC} is available and configured for logging of the cluster at http://"$BOOTSTRAP_IP":5601"
   fi
   echo -e "** ${BLUE}Done${NC}."
-  exit 1
 else
   echo -e "** Bootstrap node installation ${RED}FAILED${NC}."
   echo "** Deleting temporary files..."
@@ -915,4 +1032,12 @@ else
   #TODO FIXME: possibly also removed downloaded installer (assuming download failed)
   echo -e "** Temporary files deleted. Please ${BLUE}run the installer again${NC}."
   exit 0
+fi
+
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, run in this bootstrap node: "
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_marathon-lb.sh)${NC}"
+
+if [ "$INSTALL_CEPH" == true ]; then 
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Ceph${NC}, run in this bootstrap node: "
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_ceph.sh)${NC}"
 fi
