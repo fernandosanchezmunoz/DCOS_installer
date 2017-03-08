@@ -1003,7 +1003,7 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
   if [ "$INSTALL_ELK" == true ]; then
-   echo -e "** ${BLUE}KibanaS{NC} is available at http://"$BOOTSTRAP_IP":5601"
+   echo -e "** ${BLUE}Kibana${NC} is available at http://"$BOOTSTRAP_IP":5601"
   fi
   echo -e "** ${BLUE}Done${NC}."
 else
