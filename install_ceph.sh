@@ -155,6 +155,9 @@ curl -s -o $CEPH_CLIENT_ADMIN_KEYRING http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(bas
 #expected output if Ceph is running: "got monmap epoch 3"
 /bin/python /bin/ceph -s
 
+#restart rexray
+systemctl restart dcos-rexray
+
 #display finished message
 echo -e "${NC}Done. ${RED}Ceph${NC} is configured on this node."
 
