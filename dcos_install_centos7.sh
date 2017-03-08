@@ -998,7 +998,7 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
   if [ "$INSTALL_ELK" == true ]; then
-   echo -e "** Kibana is available at http://"$BOOTSTRAP_IP":5601"
+   echo -e "** ${BLUE}KibanaS{NC} is available at http://"$BOOTSTRAP_IP":5601"
   fi
   echo -e "** ${BLUE}Done${NC}."
 else
@@ -1018,5 +1018,5 @@ fi
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} run: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_marathon-lb.sh)${NC}"
 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${RED}CEPH on DC/OS${NC} run: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${Blue}Ceph{NC} run: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_ceph.sh)${NC}"
