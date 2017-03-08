@@ -32,7 +32,7 @@ dcos package install --yes ceph
 #wait until Ceph is available and healthy
 #until $(curl --output /dev/null --silent --head --fail http://ceph.mesos:5000); do
 while true; do
- ping -c 1 ceph.mesos
+ ping -c 1 ceph.mesos > /dev/null 2>&1
  if [ $? == 0 ]; then
     echo "** INFO: Ceph on DC/OS is available. Continuing install..."
     break
