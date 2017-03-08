@@ -1024,6 +1024,6 @@ echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in orde
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_marathon-lb.sh)${NC}"
 
 if [ "$INSTALL_CEPH" == true ]; then 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${Blue}Ceph{NC} run: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Ceph${NC} run: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_ceph.sh)${NC}"
 fi
