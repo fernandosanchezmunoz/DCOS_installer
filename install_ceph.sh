@@ -55,7 +55,6 @@ cp /usr/local/bin/zkcli /usr/bin
 #get SECRETS from Zookeeper
 SECRETS_ZK_KEY="/ceph-on-mesos/secrets.json"
 SECRETS=$(zkcli -server leader.mesos get $SECRETS_ZK_KEY | grep { )
-echo "** DEBUG: Secrets is: "$SECRETS
 
 if [[ ${SECRETS} != *"fsid"* ]]; then
 	echo "** ERROR: Couldn't get key from Zookeeper. Please check your Ceph DC/OS framework is running, healthy and CONFIGURED. Check https://github.com/dcos/examples/tree/master/1.8/ceph for details."
@@ -77,7 +76,7 @@ echo "**DEBUG: SECRETS: "$SECRETS
 echo "**DEBUG: MONITORS: "$MONITORS
 echo "**DEBUG: CEPH_CONF: "$CEPH_CONF
 
-cat <<-EOF > $CEPH_CONF
+sudo cat > $CEPH_CONF << EOF
 [global]
 fsid = $(echo $SECRETS | jq .fsid)
 mon host = "${MONITORS::-1}"
