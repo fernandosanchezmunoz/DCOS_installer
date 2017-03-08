@@ -808,6 +808,23 @@ cat /var/lib/dcos/mesos-resources | grep volume
 
 fi
 #if role == slave (install Ceph)
+
+#restore rexray older version on slave_public to avoid errors
+if [[ $ROLE == "slave_public" ]]; then
+cat > /etc/rexray/config.yml << EOF
+rexray:
+  loglevel: info
+  modules:
+    default-admin:
+      host: tcp://127.0.0.1:61003
+  storageDrivers:
+  - ec2
+  volume:
+    unmount:
+      ignoreusedcount: true
+EOF
+fi
+#if slave_public
 fi
 #if (INSTALL_CEPH==true)
 EOF2
@@ -1017,7 +1034,7 @@ else
   exit 0
 fi
 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC}, run in this bootstrap node: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, run in this bootstrap node: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/ceph2/install_marathon-lb.sh)${NC}"
 
 if [ "$INSTALL_CEPH" == true ]; then 
