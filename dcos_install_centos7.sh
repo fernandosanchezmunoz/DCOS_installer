@@ -121,8 +121,8 @@ echo "5) Installation directory:             "$WORKING_DIR
 echo "6) NTP server:                         "$NTP_SERVER
 echo "7) DNS server:                         "$DNS_SERVER
 echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
-echo "9) Pre-install Ceph on agents:         "$INSTALL_CEPH 
-echo "0) Volumes to be configured for Ceph:  "$CEPH_DISKS
+echo "9) Ceph on agents (experimental):      "$INSTALL_CEPH 
+echo "0) Volumes for Ceph (experimental):    "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -136,7 +136,7 @@ echo "**************************************************************************
           echo "** Agent installation command saved in $WORKING_DIR/$COMMAND_FILE for future use."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-8]: " PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-0]: " PARAMETER
           case $PARAMETER in
             [1]) read -p "Enter new value for Master node private IP(s): " MASTER_IP
                  ;;
@@ -158,7 +158,7 @@ echo "**************************************************************************
                  ;;
             [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
                  ;;
-              *) echo "** Invalid input. Please choose an option [1-8]"
+              *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
           esac
           ;;
