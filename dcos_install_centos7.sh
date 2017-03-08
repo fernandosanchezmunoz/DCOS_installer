@@ -320,10 +320,10 @@ resolvers:
 $([ $INSTALL_CEPH == true ] && echo \
 "rexray_config:
   rexray:
-  #  loglevel: debug
-  modules:
-    default-admin:
-      host: tcp://127.0.0.1:61003
+  #  loglevel: debug #not needed
+  #modules:          #from doc but problematic
+  #  default-admin:
+  #    host: tcp://127.0.0.1:61003
   libstorage:
     service: rbd")
 dcos_overlay_network:
@@ -744,13 +744,7 @@ mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 
 #add the configuration
-#TODO: test if the configuration is applied by DC/OS installer with upgrade
-cat > /etc/rexray/config.yml << EOF
-rexray:
-#  loglevel: debug
-libstorage:
-  service: rbd
-EOF
+#not needed: added into /etc/rexray/config.yml by installer from config.yaml
 
 #copy to libstorage config
 cp /etc/rexray/config.yml /etc/libstorage/config.yml
