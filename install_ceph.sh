@@ -191,7 +191,7 @@ echo -e "${RED}sudo su"
 echo -e "cd"
 echo -e "curl -s -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_INSTALLER) && sudo bash $(basename $CEPH_INSTALLER)"
 echo -e ""
-echo -e "${NC}Done."
+echo -e "${BLUE}Done${NC}."
 
 #remove this installer along with the secret
 rm -f $CEPH_INSTALLER
