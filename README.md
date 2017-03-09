@@ -5,7 +5,7 @@ It also generates another script to be ran (copied and pasted) in all other node
 
 Installation is performed running a single command in the *`bootstrap`* node, and copying & pasting the resulting command in each additional node of the cluster. This copy&paste command can optionally include as a parameter the `ROLE` (*`master`*/*`slave`*/*`slave_public`*) that the node in particular will have. If the parameter is not passed, the script will ask for the `ROLE` interactively.
 
-This installer is a simplified and scripted version of the **[official DC/OS Advanced Installation process](https://docs.mesosphere.com/1.8/administration/installing/custom/advanced/)**. Before using this script, you should make sure to be familiar with that installation method. This includes understanding the roles of each node type, including the *`bootstrap`* node, the *`master`* node(s), the (private) *`slave`* node(s), and the *`public_slave`* node(s).
+This installer is a simplified and scripted version of the **[official DC/OS Advanced Installation process](https://docs.mesosphere.com/1.8/administration/installing/custom/advanced/)**. Before using this script, you should make sure to be familiar with that installation method. This includes understanding the roles of each node type, including the *`bootstrap`* node, the *`master`* node(s), the (private) *`slave`* node(s), and the *`slave_public`* node(s).
 
 ***THIS SCRIPT IS PROVIDED "AS IS", AND HAS ABSOLUTELY NO WARRANTY OR SUPPORT. USE AT YOUR OWN RISK.***
 
