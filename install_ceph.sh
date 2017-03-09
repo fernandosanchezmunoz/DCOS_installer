@@ -2,8 +2,7 @@
 #install_ceph.sh
 
 #prerequisites: 
-#- a working Ceph DC/OS service
-#- jq
+#- a working Ceph DC/OS service with Marathon-LB running.
 
 #find out serve directory location
 #assume we're installed in ~/.DCOS_install
