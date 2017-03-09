@@ -1034,10 +1034,10 @@ else
   exit 0
 fi
 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, run in this bootstrap node: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, copy & paste the command below in this bootstrap agent: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_marathon-lb.sh)${NC}"
 
 if [ "$INSTALL_CEPH" == true ]; then 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Ceph${NC}, run in this bootstrap node: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install and configure the drivers for ${BLUE}Ceph${NC} on your agents, copy & paste the command below in this bootstrap agent: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph.sh)${NC}"
 fi
