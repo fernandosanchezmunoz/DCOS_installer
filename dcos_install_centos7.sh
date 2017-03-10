@@ -783,7 +783,7 @@ EOF
 chmod +x ./$CEPH_FDISK
 ./$CEPH_FDISK && rm -f $CEPH_FDISK
 
-echo ("** DEBUG: disk partitioning after formatting volumes: ")
+echo "** DEBUG: disk partitioning after formatting volumes: "
 sudo fdisk -l |grep /dev
 
 #mount the ceph disks/volumes
