@@ -754,7 +754,7 @@ libstorage:
 EOF
 
 #copy to libstorage config
-cp /etc/rexray/config.yml /etc/libstorage/config.yml
+cp -f /etc/rexray/config.yml /etc/libstorage/config.yml > /dev/null 2>&1
 
 systemctl restart dcos-rexray
 systemctl status dcos-rexray #show running version
@@ -784,6 +784,7 @@ chmod +x ./$CEPH_FDISK
 #mount the ceph disks/volumes
 # loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
 WORDS=("$CEPH_DISKS")
+echo "** DEBUG: Disks to be formatted: "$WORDS
 COUNT=${#WORDS[@]}
 for  ((i=0; i<COUNT; i++)); do
   mkdir -p /dcos/volume$i
@@ -793,6 +794,7 @@ for  ((i=0; i<COUNT; i++)); do
   mount $DISK /dcos/volume$i
   #add $DISK to /etc/fstab for automatic re-mounting on reboot
   echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
+  echo "**DEBUG: volume "$DISK" formatted and mounted as /dcos/volume$i..."
 done
 
 #display correct progress
