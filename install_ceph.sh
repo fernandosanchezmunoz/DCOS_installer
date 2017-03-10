@@ -8,15 +8,17 @@
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
-#Volume(s) to be used by Ceph
-#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
-CEPH_DISKS="/dev/xvdb"
 #configuration paths
 CEPH_CONF_PATH="/etc/ceph"
 CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
 CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
 CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
+#TODO: delete section.
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+#CEPH_DISKS_FILE=DCOS_INSTALL_PATH"/.ceph_disks"
+#CEPH_DISKS=$(echo $CEPH_DISKS_FILE)
 
 #pretty colours
 RED='\033[0;31m'
@@ -41,7 +43,8 @@ while true; do
  fi
 done
 
-echo -e "${NC}Ceph is available at http://PUBLIC-NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in:"
+echo -e "${NC}Ceph is available through Marathon-LB at http://PUBLIC-NODE:5000"
+echo -e "Please log in and configure Ceph Monitors and OSDs following the instructions in:"
 echo -e "${BLUE}https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph${NC}"
 
 #do not continue until Ceph is configured and monitors are reachable
@@ -65,16 +68,19 @@ chmod +x ./jq
 yes | cp -f jq /usr/bin > /dev/null 2>&1
 
 #zkCLi
-echo "** INFO: Installing zkCli..."
+echo "** INFO: Installing zkCli with Java and Zookeeper (this may take a while)..."
 mkdir -p /opt/zookeeper
 chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
+rm -Rf zookeeper-el7-rpm
 git clone https://github.com/id/zookeeper-el7-rpm
 cd zookeeper-el7-rpm/
-sudo yum install -y make rpmdevtools > /dev/null 2>&1
+sudo yum install -y make > /dev/null 2>&1
+sudo yum install -y rpmdevtools java > /dev/null 2>&1
 make rpm > /dev/null 2>&1
 yum install -y x86_64/zookeeper-3.4.9-1.x86_64.rpm > /dev/null 2>&1
-cp /usr/local/bin/zkcli /usr/bin
+rm -f /usr/bin/zkcli > /dev/null 2>&1
+cp -f /usr/local/bin/zkcli /usr/bin 
 
 #get SECRETS from Zookeeper
 echo "** INFO: Getting Ceph keys from Zookeeper..."
@@ -184,7 +190,7 @@ cp $CEPH_MON_KEYRING $SERVE_PATH
 cp $CEPH_CLIENT_ADMIN_KEYRING $SERVE_PATH
 
 echo "** INFO: Complete..."
-echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH AGENT OF THE CLUSTER TO CONFIGURE IT FOR CEPH:"
+echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH *PRIVATE AGENT* OF THE CLUSTER TO CONFIGURE IT FOR CEPH:"
 echo -e ""
 echo -e "${RED}sudo su"
 echo -e "cd"

@@ -55,6 +55,8 @@ ELK_HOSTNAME=$BOOTSTRAP_IP
 ELK_PORT=9200
 FILEBEAT_JOURNALCTL_CONFIG="/etc/filebeat/filebeat_journald.yml"
 FILEBEAT_JOURNALCTL_SERVICE=dcos-journalctl-filebeat.service
+#TODO: delete -- 
+## CEPH_DISKS_FILE=$WORKING_DIR"/.ceph_disks"
 
 #pretty colours
 RED='\033[0;31m'
@@ -111,18 +113,18 @@ while true; do
 clear
 echo "** Will now install a DC/OS bootstrap node with the following parameters:"
 echo ""
-echo "*****************************          ****************"
-echo "1) Master node private IP(s):          "$MASTER_IP
-echo "*****************************          ****************"
-echo "2) DC/OS username:                     "$USERNAME
-echo "3) DC/OS Password:                     "$PASSWORD
-echo "4) Cluster Name:                       "$CLUSTERNAME
-echo "5) Installation directory:             "$WORKING_DIR
-echo "6) NTP server:                         "$NTP_SERVER
-echo "7) DNS server:                         "$DNS_SERVER
-echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
-echo "9) Ceph on agents (experimental):      "$INSTALL_CEPH 
-echo "0) Volumes for Ceph (experimental):    "$CEPH_DISKS
+echo "*****************************              ****************"
+echo "1) Master node private IP(s):              "$MASTER_IP
+echo "*****************************              ****************"
+echo "2) DC/OS username:                         "$USERNAME
+echo "3) DC/OS Password:                         "$PASSWORD
+echo "4) Cluster Name:                           "$CLUSTERNAME
+echo "5) Installation directory:                 "$WORKING_DIR
+echo "6) NTP server:                             "$NTP_SERVER
+echo "7) DNS server:                             "$DNS_SERVER
+echo "8) Install ELK on bootstrap node:          "$INSTALL_ELK
+echo "9) Format agents for Ceph (experimental):  "$INSTALL_CEPH 
+echo "0) Volumes to use for Ceph (experimental): "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -156,7 +158,7 @@ echo "**************************************************************************
                  ;;
             [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
                  ;;
-            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by comma, no spaces [/dev/xvdb,/dev/xvdc]: " CEPH_DISKS
                  ;;
               *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
@@ -528,8 +530,9 @@ gpgkey=https://yum.dockerproject.org/gpg
 EOF
 
 #install docker engine, daemon and service, along with dependencies
-sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
- wget tar xz curl zip unzip ipset ntp nc screen bind-utils
+sudo yum install -y  wget tar xz curl zip unzip ipset ntp nc screen bind-utils
+sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos 
+
 
 #add overlay storage driver
 echo 'overlay'\
@@ -740,14 +743,20 @@ LOCATION=${CMD:10}
 curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
 #swap out the installed rexray for the downloaded one
 LOCATION_BAK=$LOCATION'.bak'
-mv $LOCATION $LOCATION_BAK
-mv /usr/bin/rexray $LOCATION
+mv $LOCATION $LOCATION_BAK > /dev/null 2>&1   #silent in case re-runnign and it doesnt exist
+cp -f /usr/bin/rexray $LOCATION > /dev/null 2>&1
 
 #add the configuration
-#not needed: added into /etc/rexray/config.yml by installer from config.yaml
+#should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
+cat > /etc/rexray/config.yml << EOF
+rexray:
+#  loglevel: debug #not needed
+libstorage:
+  service: rbd
+EOF
 
 #copy to libstorage config
-cp /etc/rexray/config.yml /etc/libstorage/config.yml
+cp -f /etc/rexray/config.yml /etc/libstorage/config.yml > /dev/null 2>&1
 
 systemctl restart dcos-rexray
 systemctl status dcos-rexray #show running version
@@ -761,8 +770,8 @@ cat > ./$CEPH_FDISK << EOF
 #!/bin/sh
 hdd="$CEPH_DISKS"
 EOF
-cat >> ./$CEPH_FDISK << 'EOF'
-for i in $hdd;do
+cat >> ./"$CEPH_FDISK" << 'EOF'
+for i in $(echo $hdd | sed "s/,/ /g");do  #loop through comma separated list
 echo "n
 p
 1
@@ -774,18 +783,23 @@ EOF
 chmod +x ./$CEPH_FDISK
 ./$CEPH_FDISK && rm -f $CEPH_FDISK
 
+echo "** DEBUG: disk partitioning after formatting volumes: "
+sudo fdisk -l |grep /dev
+
 #mount the ceph disks/volumes
 # loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
-WORDS=($CEPH_DISKS)
-COUNT=${#WORDS[@]}
+WORDS=("$CEPH_DISKS")
+echo "** DEBUG: Disks to be formatted: "$WORDS
+COUNT=$(IFS=,; set -- $WORDS; echo $#) #count comma-separated elements in disks list
 for  ((i=0; i<COUNT; i++)); do
   mkdir -p /dcos/volume$i
   #i-th word in string
-  DISK=$( echo $CEPH_DISKS | cut -d " " -f $(($i+1)) )
+  DISK=$( echo "$CEPH_DISKS" | cut -d "," -f $(($i+1)) )  #string is separated by "," comma
   #mount the $DISK as /dcos/volume$i
   mount $DISK /dcos/volume$i
   #add $DISK to /etc/fstab for automatic re-mounting on reboot
   echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
+  echo "** DEBUG: volume "$DISK" formatted and mounted as /dcos/volume$i..."
 done
 
 #display correct progress
@@ -1000,6 +1014,12 @@ curl https://bootstrap.pypa.io/get-pip.py | python3.4
 pip3 install --upgrade pip jsonschema requests
 pip install requests
 
+#Ceph: save disks to be used for ceph for install_ceph.sh script to read
+#################################################################################################
+#TODO: delete
+# echo $CEPH_DISKS > $CEPH_DISKS_FILE
+
+
 #Check that installation finished successfully.
 #################################################################
 sleep 3
@@ -1008,11 +1028,11 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL DC/OS:"
   echo -e ""
   echo -e ""
-  echo -e "${RED}#####################################################################################################"  
+  echo -e "${RED}########################################################################################"
   echo -e "sudo su"
   echo -e "cd"
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$NODE_INSTALLER && sudo bash $NODE_INSTALLER ${NC} [ROLE]"
-  echo -e "${RED}#####################################################################################################${NC}"  
+  echo -e "${RED}########################################################################################${NC}"  
   echo -e ""
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
@@ -1034,10 +1054,10 @@ else
   exit 0
 fi
 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, copy & paste the command below in this bootstrap agent: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC} executing as root here: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_marathon-lb.sh)${NC}"
 
 if [ "$INSTALL_CEPH" == true ]; then 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install and configure the drivers for ${BLUE}Ceph${NC} on your agents, copy & paste the command below in this bootstrap agent: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install and configure ${BLUE}Ceph${NC} executing as root here: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph.sh)${NC}"
 fi
