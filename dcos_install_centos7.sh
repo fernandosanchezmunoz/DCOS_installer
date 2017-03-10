@@ -157,7 +157,7 @@ echo "**************************************************************************
                  ;;
             [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
                  ;;
-            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces [/dev/xvdb /dev/xvdc]: " CEPH_DISKS
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by comma, no spaces [/dev/xvdb,/dev/xvdc]: " CEPH_DISKS
                  ;;
               *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
@@ -769,7 +769,7 @@ cat > ./$CEPH_FDISK << EOF
 hdd="$CEPH_DISKS"
 EOF
 cat >> ./"$CEPH_FDISK" << 'EOF'
-for i in $hdd;do
+for i in $(echo $hdd | sed "s/,/ /g");do  #loop through comma separated list
 echo "n
 p
 1
@@ -792,7 +792,7 @@ COUNT=${#WORDS[@]}
 for  ((i=0; i<COUNT; i++)); do
   mkdir -p /dcos/volume$i
   #i-th word in string
-  DISK=$( echo "$CEPH_DISKS" | cut -d " " -f $(($i+1)) )
+  DISK=$( echo "$CEPH_DISKS" | cut -d "," -f $(($i+1)) )  #string is separated by "," comma
   #mount the $DISK as /dcos/volume$i
   mount $DISK /dcos/volume$i
   #add $DISK to /etc/fstab for automatic re-mounting on reboot
