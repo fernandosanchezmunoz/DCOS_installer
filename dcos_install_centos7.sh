@@ -113,18 +113,18 @@ while true; do
 clear
 echo "** Will now install a DC/OS bootstrap node with the following parameters:"
 echo ""
-echo "*****************************          ****************"
-echo "1) Master node private IP(s):          "$MASTER_IP
-echo "*****************************          ****************"
-echo "2) DC/OS username:                     "$USERNAME
-echo "3) DC/OS Password:                     "$PASSWORD
-echo "4) Cluster Name:                       "$CLUSTERNAME
-echo "5) Installation directory:             "$WORKING_DIR
-echo "6) NTP server:                         "$NTP_SERVER
-echo "7) DNS server:                         "$DNS_SERVER
-echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
-echo "9) Ceph on agents (experimental):      "$INSTALL_CEPH 
-echo "0) Volumes for Ceph (experimental):    "$CEPH_DISKS
+echo "*****************************              ****************"
+echo "1) Master node private IP(s):              "$MASTER_IP
+echo "*****************************              ****************"
+echo "2) DC/OS username:                         "$USERNAME
+echo "3) DC/OS Password:                         "$PASSWORD
+echo "4) Cluster Name:                           "$CLUSTERNAME
+echo "5) Installation directory:                 "$WORKING_DIR
+echo "6) NTP server:                             "$NTP_SERVER
+echo "7) DNS server:                             "$DNS_SERVER
+echo "8) Install ELK on bootstrap node:          "$INSTALL_ELK
+echo "9) Format agents for Ceph (experimental):  "$INSTALL_CEPH 
+echo "0) Volumes to use for Ceph (experimental): "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
