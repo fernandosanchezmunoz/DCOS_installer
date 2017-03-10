@@ -790,7 +790,7 @@ sudo fdisk -l |grep /dev
 # loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
 WORDS=("$CEPH_DISKS")
 echo "** DEBUG: Disks to be formatted: "$WORDS
-COUNT=${#WORDS[@]}
+COUNT=$(IFS=,; set -- $WORDS; echo $#) #count comma-separated elements in disks list
 for  ((i=0; i<COUNT; i++)); do
   mkdir -p /dcos/volume$i
   #i-th word in string
@@ -799,7 +799,7 @@ for  ((i=0; i<COUNT; i++)); do
   mount $DISK /dcos/volume$i
   #add $DISK to /etc/fstab for automatic re-mounting on reboot
   echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
-  echo "**DEBUG: volume "$DISK" formatted and mounted as /dcos/volume$i..."
+  echo "** DEBUG: volume "$DISK" formatted and mounted as /dcos/volume$i..."
 done
 
 #display correct progress
