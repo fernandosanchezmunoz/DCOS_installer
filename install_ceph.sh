@@ -68,7 +68,7 @@ chmod +x ./jq
 yes | cp -f jq /usr/bin > /dev/null 2>&1
 
 #zkCLi
-echo "** INFO: Installing zkCli..."
+echo "** INFO: Installing zkCli with Java and Zookeeper (this may take a while)..."
 mkdir -p /opt/zookeeper
 chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
