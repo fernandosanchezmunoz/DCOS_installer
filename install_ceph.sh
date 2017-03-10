@@ -8,15 +8,16 @@
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
 SERVE_PATH=$DCOS_INSTALL_PATH"/genconf/serve"
-#Volume(s) to be used by Ceph
-#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
-CEPH_DISKS="/dev/xvdb"
 #configuration paths
 CEPH_CONF_PATH="/etc/ceph"
 CEPH_CONF=$CEPH_CONF_PATH"/ceph.conf"
 CEPH_MON_KEYRING=$CEPH_CONF_PATH"/ceph.mon.keyring"
 CEPH_CLIENT_ADMIN_KEYRING=$CEPH_CONF_PATH"/ceph.client.admin.keyring"
 CEPH_INSTALLER="ceph_installer.sh"
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+CEPH_DISKS_FILE=DCOS_INSTALL_PATH"/.ceph_disks"
+CEPH_DISKS=$(echo $CEPH_DISKS_FILE)
 
 #pretty colours
 RED='\033[0;31m'
