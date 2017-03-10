@@ -43,7 +43,8 @@ while true; do
  fi
 done
 
-echo -e "${NC}Ceph is available at http://PUBLIC-NODE:5000. Please log in and configure Ceph Monitors and OSDs following the instructions in:"
+echo -e "${NC}Ceph is available through Marathon-LB at http://PUBLIC-NODE:5000"
+echo -e "Please log in and configure Ceph Monitors and OSDs following the instructions in:"
 echo -e "${BLUE}https://github.com/dcos/examples/tree/master/1.8/ceph#configure-ceph${NC}"
 
 #do not continue until Ceph is configured and monitors are reachable
