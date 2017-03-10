@@ -781,6 +781,9 @@ EOF
 chmod +x ./$CEPH_FDISK
 ./$CEPH_FDISK && rm -f $CEPH_FDISK
 
+echo ("** DEBUG: disk partitioning after formatting volumes: ")
+sudo fdisk -l |grep /dev
+
 #mount the ceph disks/volumes
 # loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
 WORDS=("$CEPH_DISKS")
