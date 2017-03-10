@@ -155,7 +155,7 @@ echo "**************************************************************************
                  ;;
             [8]) if [ "$INSTALL_ELK" == false ]; then INSTALL_ELK=true; else INSTALL_ELK=false; fi
                  ;;
-            [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
+            [9]) read -p "Enter new value for DNS server: " DNS_SERVER
                  ;;
             [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
                  ;;
@@ -1040,10 +1040,10 @@ else
   exit 0
 fi
 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, copy & paste the command below in this bootstrap agent: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC}, copy & paste the command below in this bootstrap agent as root: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_marathon-lb.sh)${NC}"
 
 if [ "$INSTALL_CEPH" == true ]; then 
-echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install and configure the drivers for ${BLUE}Ceph${NC} on your agents, copy & paste the command below in this bootstrap agent: "
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, in order to install and configure the drivers for ${BLUE}Ceph${NC} on your agents, copy & paste the command below in this bootstrap agent as root: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph.sh)${NC}"
 fi
