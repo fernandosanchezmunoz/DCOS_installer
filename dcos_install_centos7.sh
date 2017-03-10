@@ -55,7 +55,8 @@ ELK_HOSTNAME=$BOOTSTRAP_IP
 ELK_PORT=9200
 FILEBEAT_JOURNALCTL_CONFIG="/etc/filebeat/filebeat_journald.yml"
 FILEBEAT_JOURNALCTL_SERVICE=dcos-journalctl-filebeat.service
-CEPH_DISKS_FILE=$WORKING_DIR"/.ceph_disks"
+#TODO: delete -- 
+## CEPH_DISKS_FILE=$WORKING_DIR"/.ceph_disks"
 
 #pretty colours
 RED='\033[0;31m'
@@ -1014,7 +1015,8 @@ pip install requests
 
 #Ceph: save disks to be used for ceph for install_ceph.sh script to read
 #################################################################################################
-echo $CEPH_DISKS > $CEPH_DISKS_FILE
+#TODO: delete
+# echo $CEPH_DISKS > $CEPH_DISKS_FILE
 
 
 #Check that installation finished successfully.
