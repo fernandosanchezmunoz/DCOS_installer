@@ -741,8 +741,8 @@ LOCATION=${CMD:10}
 curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
 #swap out the installed rexray for the downloaded one
 LOCATION_BAK=$LOCATION'.bak'
-mv $LOCATION $LOCATION_BAK
-mv /usr/bin/rexray $LOCATION
+mv $LOCATION $LOCATION_BAK > /dev/null 2>&1   #silent in case re-runnign and it doesnt exist
+cp -f /usr/bin/rexray $LOCATION > /dev/null 2>&1
 
 #add the configuration
 #should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
