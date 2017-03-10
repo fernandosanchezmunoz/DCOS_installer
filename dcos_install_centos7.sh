@@ -746,7 +746,7 @@ mv /usr/bin/rexray $LOCATION
 
 #add the configuration
 #should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
-cat > ./$CEPH_FDISK << EOF
+cat > /etc/rexray/config.yml << EOF
 rexray:
 #  loglevel: debug #not needed
 libstorage:
