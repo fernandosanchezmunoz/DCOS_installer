@@ -104,12 +104,13 @@ cd $CEPH_CONF_PATH
 #generate Ceph configuration files for the cluster on bootstrap
 #ceph.conf
 export HOST_NETWORK=0.0.0.0/0 
-export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
+#export MONITORS=$(for i in $(dig srv _mon._tcp.ceph.mesos|awk '/^_mon._tcp.ceph.mesos/'|awk '{print $8":"$7}'); do echo -n $i',';done)
 
 sudo cat > $CEPH_CONF << EOF
 [global]
 fsid = $(echo $SECRETS | jq .fsid)
-mon host = "${MONITORS::-1}"
+#mon host = "${MONITORS::-1}"
+mon host = "mon.ceph.mesos:1025"
 auth cluster required = cephx
 auth service required = cephx
 auth client required = cephx
