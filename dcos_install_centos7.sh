@@ -26,7 +26,7 @@ INSTALL_ELK=false
 INSTALL_CEPH=false
 #Volume(s) to be used by Ceph
 #separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
-CEPH_DISKS="dev/xvdb"
+CEPH_DISKS="/dev/xvdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
