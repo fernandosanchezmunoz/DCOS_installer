@@ -745,7 +745,13 @@ mv $LOCATION $LOCATION_BAK
 mv /usr/bin/rexray $LOCATION
 
 #add the configuration
-#not needed: added into /etc/rexray/config.yml by installer from config.yaml
+#should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
+cat > ./$CEPH_FDISK << EOF
+rexray:
+#  loglevel: debug #not needed
+libstorage:
+  service: rbd")
+EOF
 
 #copy to libstorage config
 cp /etc/rexray/config.yml /etc/libstorage/config.yml
