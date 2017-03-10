@@ -157,7 +157,7 @@ echo "**************************************************************************
                  ;;
             [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
                  ;;
-            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. /dev/sda /dev/sdb): " CEPH_DISKS
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by spaces (e.g. \"/dev/sda /dev/sdb\""): " CEPH_DISKS
                  ;;
               *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
