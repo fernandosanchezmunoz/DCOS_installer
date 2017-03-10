@@ -26,7 +26,7 @@ INSTALL_ELK=false
 INSTALL_CEPH=false
 #Volume(s) to be used by Ceph
 #separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
-CEPH_DISKS="/dev/xvdb"
+CEPH_DISKS="dev/xvdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
@@ -762,7 +762,7 @@ cat > ./$CEPH_FDISK << EOF
 #!/bin/sh
 hdd="$CEPH_DISKS"
 EOF
-cat >> ./$CEPH_FDISK << 'EOF'
+cat >> ./"$CEPH_FDISK" << 'EOF'
 for i in $hdd;do
 echo "n
 p
@@ -777,12 +777,12 @@ chmod +x ./$CEPH_FDISK
 
 #mount the ceph disks/volumes
 # loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
-WORDS=($CEPH_DISKS)
+WORDS=("$CEPH_DISKS")
 COUNT=${#WORDS[@]}
 for  ((i=0; i<COUNT; i++)); do
   mkdir -p /dcos/volume$i
   #i-th word in string
-  DISK=$( echo $CEPH_DISKS | cut -d " " -f $(($i+1)) )
+  DISK=$( echo "$CEPH_DISKS" | cut -d " " -f $(($i+1)) )
   #mount the $DISK as /dcos/volume$i
   mount $DISK /dcos/volume$i
   #add $DISK to /etc/fstab for automatic re-mounting on reboot
