@@ -70,6 +70,7 @@ echo "** INFO: Installing zkCli..."
 mkdir -p /opt/zookeeper
 chown nobody:nobody /opt/zookeeper
 cd /opt/zookeeper
+rm -Rf zookeeper-el7-rpm
 git clone https://github.com/id/zookeeper-el7-rpm
 cd zookeeper-el7-rpm/
 sudo yum install -y make rpmdevtools > /dev/null 2>&1
