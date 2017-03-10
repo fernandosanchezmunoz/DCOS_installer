@@ -752,7 +752,7 @@ cat > /etc/rexray/config.yml << EOF
 rexray:
 #  loglevel: debug #not needed
 libstorage:
-  service: rbd")
+  service: rbd
 EOF
 
 #copy to libstorage config
