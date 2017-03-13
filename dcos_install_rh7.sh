@@ -885,7 +885,9 @@ fi
 #if slave_public
 fi
 #if (INSTALL_CEPH==true)
+
 EOF2
+
 # $$ end of node installer
 #################################################################
 
