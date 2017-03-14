@@ -219,7 +219,7 @@ sleep 1
 #######################################
 echo "** INFO: Generating Ceph installer for agents..."
 cat <<-EOF > $CEPH_INSTALLER 
-
+#!/bin/bash
 #install depencencies
 sudo cat > ./install.sh << 'EOF'
 yum install -y \
