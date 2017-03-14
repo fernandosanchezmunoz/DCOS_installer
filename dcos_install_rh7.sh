@@ -205,8 +205,8 @@ pip3 install --upgrade pip jsonschema
 #https://bugzilla.redhat.com/show_bug.cgi?id=1411232
 yum remove -y microcode_ctl.x86_64
 #in case an older version was desired:
-#wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
-#rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
+wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
+rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
 
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
@@ -580,8 +580,8 @@ tar xz curl screen bind-utils
 #https://bugzilla.redhat.com/show_bug.cgi?id=1411232
 yum remove -y microcode_ctl.x86_64
 #in case an older version was desired:
-#wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
-#rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
+wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
+rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
  
 #configure ntp server $NTP_SERVER" 
 sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
