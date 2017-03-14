@@ -203,8 +203,8 @@ pip3 install --upgrade pip jsonschema
 
 #downgrade microcode due to bug
 #https://bugzilla.redhat.com/show_bug.cgi?id=1411232
-yum remove microcode_ctl.x86_64.2.1-16.3.el7_3
-yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
+yum remove -y microcode_ctl.x86_64
+#yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
 
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
@@ -576,8 +576,8 @@ tar xz curl screen bind-utils
 
 #downgrade microcode due to bug
 #https://bugzilla.redhat.com/show_bug.cgi?id=1411232
-yum remove microcode_ctl.x86_64.2.1-16.3.el7_3
-yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
+yum remove -y microcode_ctl.x86_64
+#yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
  
 #configure ntp server $NTP_SERVER" 
 sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
