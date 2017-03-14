@@ -23,14 +23,17 @@ NTP_SERVER="pool.ntp.org"
 DNS_SERVER="8.8.8.8"
 TELEMETRY=true 
 INSTALL_ELK=false
+INSTALL_CEPH=false
 HTTP_SERVER="www.google.com"
+#Volume(s) to be used by Ceph
+#separated by space as in  "/dev/hda /dev/hdb /dev/hdc"
+CEPH_DISKS="/dev/xvdb"
 
 #****************************************************************
 # These are for internal use and should not need modification
 #****************************************************************
 INTERFACE=$(ip route get 8.8.8.8| awk -F ' ' '{print $5}')   #name of the default route interface
 BOOTSTRAP_IP=$(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1) # this node's default route interface
-REXRAY_CONFIG_FILE="rexray.yaml"  #relative to /genconf. Currently only Amazon EBS supported
 SERVICE_NAME=dcos-bootstrap
 BOOTSTRAP_FILE=$SERVICE_NAME.sh
 INSTALLER_FILE=$(basename $DOWNLOAD_URL)
@@ -114,16 +117,18 @@ while true; do
 clear
 echo "** Will now install a DC/OS bootstrap node with the following parameters:"
 echo ""
-echo "*****************************          ****************"
-echo "1) Master node private IP(s):          "$MASTER_IP
-echo "*****************************          ****************"
-echo "2) DC/OS username:                     "$USERNAME
-echo "3) DC/OS Password:                     "$PASSWORD
-echo "4) Cluster Name:                       "$CLUSTERNAME
-echo "5) Installation directory:             "$WORKING_DIR
-echo "6) NTP server:                         "$NTP_SERVER
-echo "7) DNS server:                         "$DNS_SERVER
-echo "8) Install ELK on bootstrap node:      "$INSTALL_ELK
+echo "*****************************              ****************"
+echo "1) Master node private IP(s):              "$MASTER_IP
+echo "*****************************              ****************"
+echo "2) DC/OS username:                         "$USERNAME
+echo "3) DC/OS Password:                         "$PASSWORD
+echo "4) Cluster Name:                           "$CLUSTERNAME
+echo "5) Installation directory:                 "$WORKING_DIR
+echo "6) NTP server:                             "$NTP_SERVER
+echo "7) DNS server:                             "$DNS_SERVER
+echo "8) Install ELK on bootstrap node:          "$INSTALL_ELK
+echo "9) Format agents for Ceph (experimental):  "$INSTALL_CEPH 
+echo "0) Volumes to use for Ceph (experimental): "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -137,7 +142,7 @@ echo "**************************************************************************
           echo "** Agent installation command saved in $WORKING_DIR/$COMMAND_FILE for future use."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-8]: " PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-0]: " PARAMETER
           case $PARAMETER in
             [1]) read -p "Enter new value for Master node private IP(s): " MASTER_IP
                  ;;
@@ -155,7 +160,11 @@ echo "**************************************************************************
                  ;;  
             [8]) if [ "$INSTALL_ELK" == false ]; then INSTALL_ELK=true; else INSTALL_ELK=false; fi
                  ;;
-              *) echo "** Invalid input. Please choose an option [1-8]"
+            [9]) if [ "$INSTALL_CEPH" == false ]; then INSTALL_CEPH=true; else INSTALL_CEPH=false; fi
+                 ;;
+            [0]) read -p "Enter new value for volumes to be configured for Ceph, separated by comma, no spaces [/dev/xvdb,/dev/xvdc]: " CEPH_DISKS
+                 ;;
+              *) echo "** Invalid input. Please choose an option [1-0]"
                  ;;
           esac
           ;;
@@ -191,6 +200,13 @@ sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.12
 wget curl zip unzip ipset ntp screen git python-pip python34 jq nginx bind-utils
 curl https://bootstrap.pypa.io/get-pip.py | python3.4
 pip3 install --upgrade pip jsonschema
+
+#downgrade microcode due to bug
+#https://bugzilla.redhat.com/show_bug.cgi?id=1411232
+yum remove -y microcode_ctl.x86_64
+#in case an older version was desired:
+wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
+rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
 
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
@@ -232,9 +248,6 @@ if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]];
   echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
   read -p "** Press Enter to exit..."
   exit 1
-else
-  #run the installer as we're ready for it
-  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
 fi
 
 #Create config directory
@@ -299,20 +312,6 @@ else
 fi
 PASSWORD_HASH=`cat $PASSWORD_HASH_FILE`
 
-#generate Rex-ray configuration file for external persistent volumes with Amazon EBS
-####################################################################################
-echo "** Generating external persistent volumes configuration file for Amazon EBS..."
-
-cat > $WORKING_DIR/genconf/$REXRAY_CONFIG_FILE << EOF
-rexray:
-  loglevel: info
-  storageDrivers:
-    - ec2
-  volume:
-    unmount:
-      ignoreusedcount: true
-EOF
-
 #Generate configuration files
 #################################################################
 echo "** Generating configuration file..."
@@ -330,8 +329,6 @@ exhibitor_storage_backend: static
 master_discovery: static
 telemetry_enabled: $TELEMETRY
 security: $SECURITY_LEVEL
-rexray_config_method: file
-rexray_config_filename: $REXRAY_CONFIG_FILE
 master_list:
 $([[ $MASTER_1 != "" ]] && echo "- $MASTER_1")  \
 $([[ $MASTER_2 != "" ]] && echo "
@@ -340,6 +337,15 @@ $([[ $MASTER_3 != "" ]] && echo "
 - $MASTER_3")
 resolvers:
 - $DNS_SERVER
+$([ $INSTALL_CEPH == true ] && echo \
+"rexray_config:
+  rexray:
+  #  loglevel: debug #not needed
+  #modules:          #from doc but problematic
+  #  default-admin:
+  #    host: tcp://127.0.0.1:61003
+  libstorage:
+    service: rbd")
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -403,13 +409,43 @@ echo "** Generating agent launcher..."
 
 mkdir -p $WORKING_DIR/genconf/serve/
 # $$ start node installer
-# $$ 'EOF2' with ticks - "leave variable names as they are here"
-sudo cat > $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
+# $$ EOF2 without ticks - "translate variables on execution" -- export variables from main script into agent
+sudo tee $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-EOF2
+
 #!/bin/bash
 #
-# DC/OS Installer script for cluster nodes
+# Installer script for DC/OS cluster nodes
 # Author: Fernando Sanchez (fernando at mesosphere.com)
 #
+
+#imported variables from parent script
+BOOTSTRAP_IP=$BOOTSTRAP_IP
+BOOTSTRAP_PORT=$BOOTSTRAP_PORT
+WORKING_DIR=$WORKING_DIR
+NODE_INSTALLER=$NODE_INSTALLER
+NTP_SERVER=$NTP_SERVER
+CERT_NAME=$CERT_NAME
+CA_NAME=$CA_NAME
+KEY_NAME=$KEY_NAME
+PEM_NAME=$PEM_NAME
+INSTALL_ELK=$INSTALL_ELK
+ELK_HOSTNAME=$ELK_HOSTNAME
+ELK_PORT=$ELK_PORT
+FILEBEAT_JOURNALCTL_SERVICE=$FILEBEAT_JOURNALCTL_SERVICE
+ELK_CERT_NAME=$ELK_CERT_NAME
+ELK_KEY_NAME=$ELK_KEY_NAME
+ELK_PEM_NAME=$ELK_PEM_NAME
+ELK_CA_NAME=$ELK_CA_NAME
+INSTALL_CEPH=$INSTALL_CEPH
+CEPH_DISKS=$CEPH_DISKS
+
+#add DNS. AWS RH7.3 instances don't have one
+echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
+
+EOF2
+
+# $$ 'EOF2' with ticks - "leave variable names as they are here"
+sudo tee -a $WORKING_DIR/genconf/serve/$NODE_INSTALLER <<-'EOF2'
 
 ROLE_FILE="/root/.mesos_role"
 #pretty colours
@@ -433,12 +469,6 @@ echo "** Setting up installation directory.."
 mkdir -p /tmp/dcos
 cd /tmp/dcos
 
-EOF2
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2 #EOF without ticks: translate variables on generation
-#add DNS. AWS RH7.3 instances don't have one
-echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
-EOF2
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 #Make sure there's an internet connection
 if ping -q -c 1 -W 1 google.com >/dev/null; then
   echo "** Internet connectivity is working."
@@ -481,10 +511,8 @@ fi
 #Update system
 echo "** Updating system..."
 sudo yum update --exclude=docker-engine,docker-engine-selinux,redhat-release* --assumeyes --tolerant
-EOF2
 
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
-
+#download installer
 echo "** Downloading installer from $BOOTSTRAP_IP..."
 curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/dcos_install.sh
 
@@ -503,6 +531,11 @@ sed -i s/SELINUX=enforcing/SELINUX=permissive/g /etc/selinux/config
 setenforce 0
 
 echo "** Installing dependencies..."
+
+#install jq
+curl -O http://stedolan.github.io/jq/download/linux64/jq
+chmod +x ./jq
+yes | cp -rf jq /usr/bin
 
 #Docker with overlayfs
 echo 'overlay'\
@@ -542,8 +575,15 @@ ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/o
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
 tar xz curl screen bind-utils
  #zip unzip ipset ntp wget -- installed above with rpm
+
+#downgrade microcode due to bug
+#https://bugzilla.redhat.com/show_bug.cgi?id=1411232
+yum remove -y microcode_ctl.x86_64
+#in case an older version was desired:
+wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
+rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
  
-#configure ntp"server $NTP_SERVER" 
+#configure ntp server $NTP_SERVER" 
 sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
 sudo systemctl start ntpd && \
 sudo systemctl enable ntpd
@@ -568,10 +608,6 @@ sudo systemctl daemon-reload && \
 sudo systemctl start docker && \
 sudo systemctl enable docker
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
-
 #Ask for manual intervention if required for docker storage driver change to overlay.
 #####################################################################################
 if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]]; then
@@ -580,9 +616,6 @@ if [[ $(docker info | grep "Storage Driver:" | cut -d " " -f 3) != "overlay" ]];
   echo -e "${RED}systemctl stop docker && systemctl daemon-reload${NC}"
   read -p "** Press Enter to exit..."
   exit 1
-else
-  #run the installer
-  sudo bash $WORKING_DIR/$BOOTSTRAP_FILE
 fi
 
 echo "** Running installer as $ROLE..."
@@ -601,12 +634,9 @@ fi
 #fix for Zeppelin -- add FQDN
 sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
-EOF2
-
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
 if [ "$INSTALL_ELK" = true ]; then 
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Installing Filebeat (aka. logstash-forwarder) ... "
 
@@ -643,16 +673,9 @@ output.elasticsearch:
 #  ssl.key: "/etc/pki/tls/private/$ELK_KEY_NAME"
 EOF
 
-EOF2
-
-sudo cat >> $WORKING_DIR/genconf/serve/$NODE_INSTALLER << 'EOF2'
 sudo mkdir -p /var/log/dcos
 #read the $ROLE variable inside the node, don't translate it while running this in the bootstrap
 if [[ $ROLE == "master" ]]; then
-EOF2
-
-#back to variable substitution when running in bootstrap
-sudo cat >>  $WORKING_DIR/genconf/serve/$NODE_INSTALLER << EOF2
 
 echo "** Creating service to parse DC/OS Master logs into Filebeat ..."
 sudo tee /etc/systemd/system/$FILEBEAT_JOURNALCTL_SERVICE<<-EOF 
@@ -760,9 +783,123 @@ sudo chkconfig $FILEBEAT_JOURNALCTL_SERVICE on
 sudo systemctl start filebeat
 sudo chkconfig filebeat on
 
-EOF2
 fi 
 #if INSTALL_ELK=true
+
+#Ceph: install the newest REXRAY on agents and swap out the one in the DCOS installation
+if [ "$INSTALL_CEPH" == true ]; then 
+
+if [[ $ROLE == "slave" ]]; then
+echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
+#find out the rexray location
+REXRAY_SYSTEMD_FILE='/etc/systemd/system/dcos-rexray.service'
+LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
+CMD=$(echo $LAST_LINE|awk '{print $1}')
+LOCATION=${CMD:10}
+#download the latest rexray
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -
+#swap out the installed rexray for the downloaded one
+LOCATION_BAK=$LOCATION'.bak'
+mv $LOCATION $LOCATION_BAK > /dev/null 2>&1   #silent in case re-runnign and it doesnt exist
+cp -f /usr/bin/rexray $LOCATION > /dev/null 2>&1
+
+#add the configuration
+#should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
+cat > /etc/rexray/config.yml << EOF
+rexray:
+#  loglevel: debug #not needed
+libstorage:
+  service: rbd
+EOF
+
+#copy to libstorage config
+cp -f /etc/rexray/config.yml /etc/libstorage/config.yml > /dev/null 2>&1
+
+systemctl restart dcos-rexray
+systemctl status dcos-rexray #show running version
+
+#format volumes/disks
+echo "** INFO: Formatting volume(s): "$CEPH_DISKS" for use with Ceph..."
+# just a name for the script below.
+CEPH_FDISK=ceph_fdisk_headless.sh 
+# Format disks as XFS
+cat > ./$CEPH_FDISK << EOF
+#!/bin/sh
+hdd="$CEPH_DISKS"
+EOF
+cat >> ./"$CEPH_FDISK" << 'EOF'
+for i in $(echo $hdd | sed "s/,/ /g");do  #loop through comma separated list
+echo "n
+p
+1
+
+
+w
+"|fdisk $i;mkfs.xfs -f $i;done
+EOF
+chmod +x ./$CEPH_FDISK
+./$CEPH_FDISK && rm -f $CEPH_FDISK
+
+echo "** DEBUG: disk partitioning after formatting volumes: "
+sudo fdisk -l |grep /dev
+
+#mount the ceph disks/volumes
+# loop through the disks/volumes in $CEPH_DISKS, mount them under /dcos/volumeX
+WORDS=("$CEPH_DISKS")
+echo "** DEBUG: Disks to be formatted: "$WORDS
+COUNT=$(IFS=,; set -- $WORDS; echo $#) #count comma-separated elements in disks list
+for  ((i=0; i<COUNT; i++)); do
+  mkdir -p /dcos/volume$i
+  #i-th word in string
+  DISK=$( echo "$CEPH_DISKS" | cut -d "," -f $(($i+1)) )  #string is separated by "," comma
+  #mount the $DISK as /dcos/volume$i
+  mount $DISK /dcos/volume$i
+  #add $DISK to /etc/fstab for automatic re-mounting on reboot
+  echo "$DISK /dcos/volume$i xfs defaults 0 0" >> /etc/fstab
+  echo "** DEBUG: volume "$DISK" formatted and mounted as /dcos/volume$i..."
+done
+
+#display correct progress
+echo "** INFO: Formatting done:"
+mount | grep "/dcos/volume"
+
+#restart mesos slave
+echo "** INFO: Restarting mesos slave process to add new volumes... "
+systemctl stop dcos-mesos-slave
+rm -f /var/lib/dcos/mesos-resources
+rm -f /var/lib/mesos/slave/meta/slaves/latest
+/opt/mesosphere/bin/make_disk_resources.py /var/lib/dcos/mesos-resources
+sleep 10 #wait to ensure mesos-slave service is there
+systemctl start dcos-mesos-slave
+echo "** INFO: Done. New Volumes added to Mesos: "
+
+sleep 3
+systemctl restart dcos-mesos-slave
+cat /var/lib/dcos/mesos-resources | grep volume
+
+fi
+#if role == slave (install Ceph)
+
+#restore rexray older version on slave_public to avoid errors
+if [[ $ROLE == "slave_public" ]]; then
+cat > /etc/rexray/config.yml << EOF
+rexray:
+  loglevel: info
+  modules:
+    default-admin:
+      host: tcp://127.0.0.1:61003
+  storageDrivers:
+  - ec2
+  volume:
+    unmount:
+      ignoreusedcount: true
+EOF
+fi
+#if slave_public
+fi
+#if (INSTALL_CEPH==true)
+
+EOF2
 
 # $$ end of node installer
 #################################################################
@@ -931,18 +1068,24 @@ fi #if INSTALL_ELK = true
 
 #Check that installation finished successfully.
 #################################################################
-sleep 5
-if [ -f $TEST_FILE ]; then
+sleep 3
+if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) == "true" ]; then
   echo -e "** ${BLUE}SUCCESS${NC}. Bootstrap node installed."
   echo -e "** ${BLUE}COPY AND PASTE THE FOLLOWING INTO EACH NODE OF THE CLUSTER TO INSTALL DC/OS:"
   echo -e ""
-  echo -e "${RED}sudo su -" 
-  echo -e "${RED}curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$NODE_INSTALLER && sudo bash $NODE_INSTALLER ${NC} [ROLE]"
   echo -e ""
+  echo -e "${RED}########################################################################################"
+  echo -e "sudo su"
+  echo -e "cd"
+  echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$NODE_INSTALLER && sudo bash $NODE_INSTALLER ${NC} [ROLE]"
+  echo -e "${RED}########################################################################################${NC}"  
+  echo -e ""
+  echo -e ""
+  echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
   if [ "$INSTALL_ELK" == true ]; then
-   echo -e "** Kibana is available at http://"$BOOTSTRAP_IP":5601"
+   echo -e "** ${BLUE}Kibana${NC} is available and configured for logging of the cluster at http://"$BOOTSTRAP_IP":5601"
   fi
-  exit 1
+  echo -e "** ${BLUE}Done${NC}."
 else
   echo -e "** Bootstrap node installation ${RED}FAILED${NC}."
   echo "** Deleting temporary files..."
@@ -955,4 +1098,12 @@ else
   #TODO FIXME: possibly also removed downloaded installer (assuming download failed)
   echo -e "** Temporary files deleted. Please ${BLUE}run the installer again${NC}."
   exit 0
+fi
+
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC} executing as root here: "
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_marathon-lb.sh)${NC}"
+
+if [ "$INSTALL_CEPH" == true ]; then 
+echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install and configure ${BLUE}Ceph${NC} executing as root here: "
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph_rh7.sh)${NC}"
 fi

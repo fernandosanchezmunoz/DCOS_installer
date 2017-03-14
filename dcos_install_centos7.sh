@@ -55,8 +55,6 @@ ELK_HOSTNAME=$BOOTSTRAP_IP
 ELK_PORT=9200
 FILEBEAT_JOURNALCTL_CONFIG="/etc/filebeat/filebeat_journald.yml"
 FILEBEAT_JOURNALCTL_SERVICE=dcos-journalctl-filebeat.service
-#TODO: delete -- 
-## CEPH_DISKS_FILE=$WORKING_DIR"/.ceph_disks"
 
 #pretty colours
 RED='\033[0;31m'
@@ -406,6 +404,7 @@ BOOTSTRAP_IP=$BOOTSTRAP_IP
 BOOTSTRAP_PORT=$BOOTSTRAP_PORT
 WORKING_DIR=$WORKING_DIR
 NODE_INSTALLER=$NODE_INSTALLER
+NTP_SERVER=$NTP_SERVER
 CERT_NAME=$CERT_NAME
 CA_NAME=$CA_NAME
 KEY_NAME=$KEY_NAME
@@ -488,7 +487,7 @@ fi
 
 #Update system
 echo "** Updating system..."
-sudo yum update --exclude=docker-engine,docker-engine-selinux --assumeyes --tolerant
+sudo yum update --exclude=docker-engine,docker-engine-selinux,centos-release* --assumeyes --tolerant
 
 #download installer
 echo "** Downloading installer from $BOOTSTRAP_IP..."
@@ -533,6 +532,10 @@ EOF
 sudo yum install -y  wget tar xz curl zip unzip ipset ntp nc screen bind-utils
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos 
 
+#configure ntp server $NTP_SERVER" 
+sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
+sudo systemctl start ntpd && \
+sudo systemctl enable ntpd
 
 #add overlay storage driver
 echo 'overlay'\
@@ -728,7 +731,6 @@ sudo chkconfig filebeat on
 fi
 #if INSTALL_ELK=true
 
-
 #Ceph: install the newest REXRAY on agents and swap out the one in the DCOS installation
 if [ "$INSTALL_CEPH" == true ]; then 
 
@@ -841,7 +843,9 @@ fi
 #if slave_public
 fi
 #if (INSTALL_CEPH==true)
+
 EOF2
+
 # $$ end of node installer
 #################################################################
 
@@ -1013,12 +1017,6 @@ yum install -y git python-pip python34 jq nginx
 curl https://bootstrap.pypa.io/get-pip.py | python3.4
 pip3 install --upgrade pip jsonschema requests
 pip install requests
-
-#Ceph: save disks to be used for ceph for install_ceph.sh script to read
-#################################################################################################
-#TODO: delete
-# echo $CEPH_DISKS > $CEPH_DISKS_FILE
-
 
 #Check that installation finished successfully.
 #################################################################
