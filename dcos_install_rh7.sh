@@ -1091,5 +1091,5 @@ echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmu
 
 if [ "$INSTALL_CEPH" == true ]; then 
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install and configure ${BLUE}Ceph${NC} executing as root here: "
-echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph.sh)${NC}"
+echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph_rh7.sh)${NC}"
 fi
