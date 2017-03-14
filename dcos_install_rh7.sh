@@ -201,6 +201,11 @@ wget curl zip unzip ipset ntp screen git python-pip python34 jq nginx bind-utils
 curl https://bootstrap.pypa.io/get-pip.py | python3.4
 pip3 install --upgrade pip jsonschema
 
+#downgrade microcode due to bug
+#https://bugzilla.redhat.com/show_bug.cgi?id=1411232
+yum remove microcode_ctl.x86_64.2.1-16.3.el7_3
+yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
+
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
 wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32
@@ -568,6 +573,11 @@ ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.2/x86_64/o
 sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos \
 tar xz curl screen bind-utils
  #zip unzip ipset ntp wget -- installed above with rpm
+
+#downgrade microcode due to bug
+#https://bugzilla.redhat.com/show_bug.cgi?id=1411232
+yum remove microcode_ctl.x86_64.2.1-16.3.el7_3
+yum install -y microcode_ctl.x86_64.2:2.1-16.el7.x86_64
  
 #configure ntp server $NTP_SERVER" 
 sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
