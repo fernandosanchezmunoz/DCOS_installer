@@ -101,7 +101,7 @@ rpm --rebuilddb
 sudo cat > ./install.sh << 'EOF'
 yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-rpm -Fvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
+rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b/bash-completion-extras-2.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 yum install -y \
@@ -227,7 +227,7 @@ yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 #dependencies
-rpm -Fvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
+rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b/bash-completion-extras-2.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 
