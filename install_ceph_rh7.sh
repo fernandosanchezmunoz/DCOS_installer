@@ -228,7 +228,7 @@ rpm -Fvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/P
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b/bash-completion-extras-2.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 yum install -y \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/cryptsetup-1.7.2-1.el7.x86_64.rpm
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/cryptsetup-1.7.2-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/lttng-ust-2.4.1-4.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/virt/x86_64/ovirt-4.0/common/userspace-rcu-0.7.7-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libbabeltrace-1.2.4-3.el7.x86_64.rpm \
