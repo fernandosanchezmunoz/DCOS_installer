@@ -121,7 +121,7 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/python-jav
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/spax-1.5.2-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/hdparm-9.43-5.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/f/fcgi-2.4.0-25.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-devel-1.12.0-11.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-1.12.0-11.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librados2-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-base-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-common-10.2.3-0.el7.x86_64.rpm \
@@ -251,7 +251,7 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/python-jav
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/spax-1.5.2-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/hdparm-9.43-5.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/f/fcgi-2.4.0-25.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-devel-1.12.0-11.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-1.12.0-11.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librados2-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-base-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-common-10.2.3-0.el7.x86_64.rpm \
