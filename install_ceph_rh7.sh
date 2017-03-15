@@ -95,10 +95,9 @@ fi
 #install ceph on bootstrap for testing
 echo "** INFO: Installing Ceph..."
 rpm --rebuilddb 
-# yum install -y --enablerepo=extras bind-utils epel-release centos-release-ceph && yum install -y ceph
 
-#install depencencies
-sudo cat > ./install.sh << 'EOF'
+#install ceph and depencencies
+sudo cat > ./install_ceph.sh << 'EOF'
 yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
@@ -107,11 +106,8 @@ ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-200
 yum install -y \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/cryptsetup-1.7.2-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/lttng-ust-2.4.1-4.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/virt/x86_64/ovirt-4.0/common/userspace-rcu-0.7.7-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libbabeltrace-1.2.4-3.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/fcgi-2.4.0-21.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/extras/x86_64/Packages/python-flask-0.10.1-4.el7.noarch.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/leveldb-1.12.0-5.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/libaio-0.3.109-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/boost-program-options-1.53.0-26.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/gperftools-libs-2.4-8.el7.x86_64.rpm \
@@ -129,30 +125,58 @@ ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/w
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/python-javapackages-3.4.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/spax-1.5.2-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/hdparm-9.43-5.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librados2-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-common-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libcephfs1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librbd1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-cephfs-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-rados-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-rbd-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm 
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/fcgi-2.4.0-21.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/f/fcgi-2.4.0-25.el7.x86_64.rpm
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/leveldb-1.12.0-5.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-devel-1.12.0-11.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/librados2-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librados2-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-base-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-common-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-common-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-mds-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-mon-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-osd-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-selinux-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librgw2-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libcephfs1-10.2.3-0.el7.x86_64.rpm
+#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libradosstriper1-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/librbd1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librbd1-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-cephfs-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-cephfs-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-rados-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rados-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-rbd-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rbd-10.2.3-0.el7.x86_64.rpm \
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/virt/x86_64/ovirt-4.0/common/userspace-rcu-0.7.7-1.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/userspace-rcu-0.7.7-1.el7.x86_64.rpm
+
+#TODO: Delete
+#https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm  \
+#https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
 
 EOF
-chmod +x ./install.sh
-bash ./install.sh
+
+chmod +x ./install_ceph.sh
+bash ./install_ceph.sh
 
 #configure ceph
 echo "** INFO: Configuring Ceph..."
@@ -222,6 +246,9 @@ cat <<-EOF > $CEPH_INSTALLER
 #!/bin/bash
 #install depencencies
 sudo cat > ./install.sh << 'EOF2'
+
+rpm --rebuilddb 
+
 #epel
 yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -231,15 +258,18 @@ rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/P
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b/bash-completion-extras-2.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 
-#ceph and depencencies
+#install ceph w/depencencies
+sudo cat > ./install_ceph.sh << 'EOF'
+yum install -y \
+https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b/bash-completion-extras-2.1-11.el7.noarch.rpm \
+ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 yum install -y \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/cryptsetup-1.7.2-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/lttng-ust-2.4.1-4.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/virt/x86_64/ovirt-4.0/common/userspace-rcu-0.7.7-1.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libbabeltrace-1.2.4-3.el7.x86_64.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/fcgi-2.4.0-21.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/extras/x86_64/Packages/python-flask-0.10.1-4.el7.noarch.rpm \
-ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/leveldb-1.12.0-5.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/libaio-0.3.109-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/boost-program-options-1.53.0-26.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/gperftools-libs-2.4-8.el7.x86_64.rpm \
@@ -257,43 +287,58 @@ ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/w
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/python-javapackages-3.4.1-11.el7.noarch.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/spax-1.5.2-13.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/hdparm-9.43-5.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librados2-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-common-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libcephfs1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librbd1-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-cephfs-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-rados-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/python-rbd-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
-https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm 
-EOF2
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/fcgi-2.4.0-21.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/f/fcgi-2.4.0-25.el7.x86_64.rpm
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-hammer/leveldb-1.12.0-5.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/l/leveldb-devel-1.12.0-11.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/librados2-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librados2-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-base-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-common-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-common-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-mds-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-mon-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-osd-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/ceph-selinux-10.2.3-0.el7.x86_64.rpm \
+#
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librgw2-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libcephfs1-10.2.3-0.el7.x86_64.rpm
+#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/libradosstriper1-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/librbd1-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/librbd1-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-cephfs-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-cephfs-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-rados-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rados-10.2.3-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-rbd-0.94.10-0.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rbd-10.2.3-0.el7.x86_64.rpm \
+#ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/virt/x86_64/ovirt-4.0/common/userspace-rcu-0.7.7-1.el7.x86_64.rpm \
+ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/userspace-rcu-0.7.7-1.el7.x86_64.rpm
 
-chmod +x ./install.sh
-bash ./install.sh
+#TODO: Delete
+#https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm  \
+#https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
+#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
 
-#install ceph
-#sudo tee /etc/yum.repos.d/ceph.repo <<-EOF2
-#[ceph]
-#name=Ceph packages for $basearch
-#baseurl=https://download.ceph.com/rpm-jewel/el7/x86_64/  
-#enabled=1
-#priority=2
-#gpgcheck=1
-#gpgkey=https://download.ceph.com/keys/release.asc
-#EOF2
+EOF
 
-#rpm --rebuilddb && yum install -y bind-utils centos-release-ceph && yum install -y ceph
+chmod +x ./install_ceph.sh
+bash ./install_ceph.sh
 
 #get config and keys from bootstrap node, place in the right directory
 curl -s -o $CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
