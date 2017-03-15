@@ -175,8 +175,8 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/us
 
 EOF
 
-chmod +x ./install_ceph.sh
-bash ./install_ceph.sh
+chmod +x ./install_ceph_local.sh
+bash ./install_ceph_local.sh
 
 #configure ceph
 echo "** INFO: Configuring Ceph..."
@@ -335,8 +335,8 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/us
 
 EOF
 
-chmod +x ./install_ceph.sh
-bash ./install_ceph.sh
+chmod +x ./install_ceph_local.sh
+bash ./install_ceph_local.sh
 
 #get config and keys from bootstrap node, place in the right directory
 curl -s -o $CEPH_CONF http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$(basename $CEPH_CONF)
