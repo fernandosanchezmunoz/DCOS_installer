@@ -138,19 +138,6 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/pyt
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rbd-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/userspace-rcu-0.7.7-1.el7.x86_64.rpm
 
-#TODO: Delete
-#https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm  \
-#https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
-
 EOF
 
 chmod +x ./install_ceph_local.sh
@@ -280,19 +267,6 @@ ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/pyt
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rados-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/ceph-jewel/python-rbd-10.2.3-0.el7.x86_64.rpm \
 ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/storage/x86_64/gluster-3.7/userspace-rcu-0.7.7-1.el7.x86_64.rpm
-
-#TODO: Delete
-#https://download.ceph.com/rpm/el7/x86_64/librados2-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-fuse-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-libs-compat-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-radosgw-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/ceph-test-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/rbd-fuse-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/rest-bench-0.94.10-0.el7.x86_64.rpm  \
-#https://download.ceph.com/rpm/el7/x86_64/librbd1-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/python-ceph-compat-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/libcephfs1-devel-0.94.10-0.el7.x86_64.rpm \
-#https://download.ceph.com/rpm/el7/x86_64/libradosstriper1-devel-0.94.10-0.el7.x86_64.rpm \
 
 EOF
 
