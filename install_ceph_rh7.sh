@@ -97,7 +97,7 @@ echo "** INFO: Installing Ceph..."
 rpm --rebuilddb 
 
 #install ceph and depencencies
-sudo cat > ./install_ceph.sh << 'EOF'
+sudo cat > ./install_ceph_local.sh << 'EOF'
 yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
@@ -242,11 +242,10 @@ sleep 1
 #generate ceph_installer.sh to be used in agents
 #######################################
 echo "** INFO: Generating Ceph installer for agents..."
-cat <<-EOF > $CEPH_INSTALLER 
+cat <<-EOF2 > $CEPH_INSTALLER 
 #!/bin/bash
-#install depencencies
-sudo cat > ./install.sh << 'EOF2'
 
+sudo cat > ./install_ceph_local.sh << 'EOF'
 rpm --rebuilddb 
 
 #epel
@@ -259,7 +258,6 @@ ftp://ftp.pbone.net/mirror/download.fedora.redhat.com/pub/fedora/epel/7/x86_64/b
 ftp://ftp.pbone.net/mirror/atrpms.net/el7-i386/atrpms/stable/bash-completion-20060301-11.noarch.rpm 
 
 #install ceph w/depencencies
-sudo cat > ./install_ceph.sh << 'EOF'
 yum install -y \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -Uvh --nodeps ftp://ftp.pbone.net/mirror/ftp.centos.org/7.3.1611/os/x86_64/Packages/redhat-lsb-core-4.1-27.el7.centos.1.x86_64.rpm \
@@ -356,7 +354,7 @@ systemctl restart dcos-rexray
 #display finished message
 echo -e "${NC}Done. ${RED}Ceph${NC} is configured on this node."
 
-EOF
+EOF2
 ######################
 #end of ceph installer
 
