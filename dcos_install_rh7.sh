@@ -632,7 +632,7 @@ else
 fi
 
 #fix for Zeppelin -- add FQDN
-sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
+#sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
 #Install filebeat (aka. logstash_forwarder) if Install_ELK = true.
 #####################################################################################
