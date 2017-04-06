@@ -1071,7 +1071,8 @@ fi #if INSTALL_ELK = true
 if [ "$INSTALL_CEPH" == true ]; then 
 
 curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.1
-
+mkdir -p /etc/rexray
+mkdir -p /etc/libstorage
 cat > /etc/rexray/config.yml << EOF
 rexray:
 #  loglevel: debug #not needed
@@ -1097,7 +1098,6 @@ EOF
 systemctl daemon-reload
 systemctl start rexray
 fi
-
 
 #Check that installation finished successfully.
 #################################################################
