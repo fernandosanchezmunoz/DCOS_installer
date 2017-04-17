@@ -268,7 +268,7 @@ EOF
 else
         echo "** This is not an EC2 instance. Using my [eth0] interface as my IP."
         #ip-detect script -- INTERFACE VERSION for BAREMETAL
-        sudo cat > $WORKING_DIR/genconf/ip-detect << 'EOF'
+        sudo cat > $WORKING_DIR/genconf/ip-detect << EOF
 #!/usr/bin/env bash
 set -o nounset -o errexit
 echo $(/usr/sbin/ip route get $DNS_SERVER | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | tail -1)
