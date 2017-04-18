@@ -844,8 +844,10 @@ fi
 fi
 #if (INSTALL_CEPH==true)
 
-EOF2
+#fix for Zeppelin "disconnected"
+sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
+EOF2
 # $$ end of node installer
 #################################################################
 
