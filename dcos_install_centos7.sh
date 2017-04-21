@@ -857,6 +857,7 @@ fi
 sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
 #add default DC/OS registry as untrusted valid
+mkdir -p /etc/systemd/system/docker.service.d/
 sudo tee /etc/systemd/system/docker.service.d/override.conf  <<-'EOF'
 [Service]
 EnvironmentFile=-/etc/sysconfig/docker
