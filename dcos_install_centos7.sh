@@ -847,6 +847,24 @@ fi
 #fix for Zeppelin "disconnected"
 sudo sh -c "echo $(/opt/mesosphere/bin/detect_ip) $(hostnamectl | grep Static | cut -f2 -d: | sed 's/\ //') $(hostname -s) >> /etc/hosts"
 
+#add default DC/OS registry as untrusted valid
+sudo tee /etc/systemd/system/docker.service.d/override.conf  <<-'EOF'
+[Service]
+EnvironmentFile=-/etc/sysconfig/docker
+EnvironmentFile=-/etc/sysconfig/docker-storage
+EnvironmentFile=-/etc/sysconfig/docker-network
+ExecStart=
+ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
+         $DOCKER_STORAGE_OPTIONS \
+         $DOCKER_NETWORK_OPTIONS \
+         $BLOCK_REGISTRY \
+         $INSECURE_REGISTRY \
+         --storage-driver=overlay \
+         --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000 
+EOF
+systemctl daemon-reload
+systemctl restart docker
+
 EOF2
 # $$ end of node installer
 #################################################################
