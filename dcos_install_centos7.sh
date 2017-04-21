@@ -861,6 +861,7 @@ ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
          $INSECURE_REGISTRY \
          --storage-driver=overlay \
          --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000 
+MountFlags=shared
 EOF
 systemctl daemon-reload
 systemctl restart docker
