@@ -205,7 +205,8 @@ echo 'overlay'\
 >> /etc/modules-load.d/overlay.conf
 
 #docker override to boot with overlay storage driver
-sudo tee /etc/systemd/system/docker.service.d/override.conf  <<-'EOF'
+mkdir -p /etc/systemd/system/docker.service.d
+sudo cat > /etc/systemd/system/docker.service.d/override.conf  << 'EOF'
 [Service]
 EnvironmentFile=-/etc/sysconfig/docker
 EnvironmentFile=-/etc/sysconfig/docker-storage
@@ -220,7 +221,6 @@ ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
          --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000 
 MountFlags=shared
 EOF
-
 
 #restart docker with overlay driver and new configuration
 sudo systemctl stop docker &&\
