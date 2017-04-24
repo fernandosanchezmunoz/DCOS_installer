@@ -751,7 +751,7 @@ LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
 CMD=$(echo $LAST_LINE|awk '{print $1}')
 LOCATION=${CMD:10}
 #download the latest rexray
-curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.1
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.2
 #swap out the installed rexray for the downloaded one
 LOCATION_BAK=$LOCATION'.bak'
 mv $LOCATION $LOCATION_BAK > /dev/null 2>&1   #silent in case re-runnign and it doesnt exist
@@ -1052,7 +1052,7 @@ pip install requests
 #########################################################################
 if [ "$INSTALL_CEPH" == true ]; then 
 
-curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.1
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.2
 mkdir -p /etc/rexray
 mkdir -p /etc/libstorage
 cat > /etc/rexray/config.yml << EOF
