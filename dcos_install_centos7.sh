@@ -333,8 +333,13 @@ $([ $INSTALL_CEPH == true ] && echo \
   #modules:          #from doc but problematic
   #  default-admin:
   #    host: tcp://127.0.0.1:61003
-  libstorage:
-    service: rbd")
+libstorage:
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd")
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -751,7 +756,7 @@ LAST_LINE=$(tac $REXRAY_SYSTEMD_FILE|egrep -m 1 .)
 CMD=$(echo $LAST_LINE|awk '{print $1}')
 LOCATION=${CMD:10}
 #download the latest rexray
-curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.1
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.2
 #swap out the installed rexray for the downloaded one
 LOCATION_BAK=$LOCATION'.bak'
 mv $LOCATION $LOCATION_BAK > /dev/null 2>&1   #silent in case re-runnign and it doesnt exist
@@ -761,9 +766,14 @@ cp -f /usr/bin/rexray $LOCATION > /dev/null 2>&1
 #should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
 cat > /etc/rexray/config.yml << EOF
 rexray:
-#  loglevel: debug #not needed
 libstorage:
-  service: rbd
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd
+
 EOF
 
 #copy to libstorage config
@@ -1052,7 +1062,7 @@ pip install requests
 #########################################################################
 if [ "$INSTALL_CEPH" == true ]; then 
 
-curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.1
+curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.2
 mkdir -p /etc/rexray
 mkdir -p /etc/libstorage
 cat > /etc/rexray/config.yml << EOF
