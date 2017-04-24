@@ -1,0 +1,11 @@
+efs:
+  accessKey:      XXXXXXXXXX
+  secretKey:      XXXXXXXXXX
+  securityGroups:
+  - sg-XXXXXXX
+  - sg-XXXXXX0
+  - sg-XXXXXX1
+  region:              us-east-1
+  tag:                 test
+  disableSessionCache: false
+

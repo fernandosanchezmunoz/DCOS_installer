@@ -1,0 +1,16 @@
+libstorage:
+  server:
+    tasks:
+      exeTimeout: 120s
+    services:
+      azure:
+        driver: azureud
+        azureud:
+          subscriptionID: abcdef01-2345-6789-abcd-ef0123456789
+          resourceGroup: testgroup
+          tenantID: usernamehotmail.onmicrosoft.com
+          storageAccount: username
+          storageAccessKey: XXXXXXXX
+          clientID: 123def01-2345-6789-abcd-ef0123456789
+          clientSecret: XXXXXXXX
+

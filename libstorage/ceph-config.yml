@@ -1,0 +1,4 @@
+rexray:
+#  loglevel: debug #not needed
+libstorage:
+  service: rbd

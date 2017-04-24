@@ -1,0 +1,5 @@
+s3fs:
+  region:           us-east-1
+  accessKey:        XXXXXXXXXX
+  secretKey:        XXXXXXXXXX
+  disablePathStyle: false

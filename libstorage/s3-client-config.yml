@@ -1,0 +1,7 @@
+s3fs:
+  cmd:            s3fs
+  options:
+  - XXXX
+  - XXXX
+  accessKey:      XXXXXXXXXX
+  secretKey:      XXXXXXXXXX

@@ -1,0 +1,9 @@
+libstorage:
+  server:
+    services:
+      s3fs:
+        driver: s3fs
+        s3fs:
+          accessKey:      XXXXXXXXXX
+          secretKey:      XXXXXXXXXX
+

@@ -1,0 +1,9 @@
+libstorage:
+  server:
+    services:
+      ebs:
+        driver: ebs
+        ebs:
+          accessKey:      XXXXXXXXXX
+          secretKey:      XXXXXXXXXX
+          region:         us-east-1
