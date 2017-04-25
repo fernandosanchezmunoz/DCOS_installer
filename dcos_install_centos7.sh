@@ -333,8 +333,13 @@ $([ $INSTALL_CEPH == true ] && echo \
   #modules:          #from doc but problematic
   #  default-admin:
   #    host: tcp://127.0.0.1:61003
-  libstorage:
-    service: rbd")
+libstorage:
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd")
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -761,9 +766,14 @@ cp -f /usr/bin/rexray $LOCATION > /dev/null 2>&1
 #should be added into /etc/rexray/config.yml by installer from config.yaml but current version breaks it
 cat > /etc/rexray/config.yml << EOF
 rexray:
-#  loglevel: debug #not needed
 libstorage:
-  service: rbd
+  server:
+    services:
+      rbd:
+        driver: rbd
+        rbd:
+          defaultPool: rbd
+
 EOF
 
 #copy to libstorage config
