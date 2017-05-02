@@ -4,6 +4,14 @@
 #prerequisites: 
 #- a working Ceph DC/OS service with Marathon-LB running.
 
+# Pre-checks
+#################################################################
+#make sure we're running as root
+if [ "$EUID" -ne 0 ]; then
+  echo "** Please run as root. Exiting."
+  exit
+fi
+
 #find out serve directory location
 #assume we're installed in ~/.DCOS_install
 DCOS_INSTALL_PATH="/root/DCOS_install"
