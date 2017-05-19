@@ -353,15 +353,6 @@ dcos_overlay_network:
    - name: dcos
      subnet: 192.168.0.0/19
      prefix: 24
-   - name: dcos-1
-     subnet: 192.168.32.0/19
-     prefix: 24
-   - name: dcos-2
-     subnet: 192.168.64.0/19
-     prefix: 24
-   - name: dcos-3
-     subnet: 192.168.96.0/19
-     prefix: 24
 superuser_password_hash: $PASSWORD_HASH
 superuser_username: $USERNAME
 $CUSTOMER_KEY
