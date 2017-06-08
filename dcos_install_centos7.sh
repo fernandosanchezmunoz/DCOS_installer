@@ -121,8 +121,6 @@ echo "5) Installation directory:                 "$WORKING_DIR
 echo "6) NTP server:                             "$NTP_SERVER
 echo "7) DNS server:                             "$DNS_SERVER
 echo "8) Install ELK on bootstrap node:          "$INSTALL_ELK
-echo "9) Format agents for Ceph (experimental):  "$INSTALL_CEPH 
-echo "0) Volumes to use for Ceph (experimental): "$CEPH_DISKS
 echo ""
 echo "******************************************************************************"
 
@@ -218,7 +216,7 @@ ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
          $BLOCK_REGISTRY \
          $INSECURE_REGISTRY \
          --storage-driver=overlay \
-         --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000 
+         --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000
 MountFlags=shared
 EOF
 
@@ -326,15 +324,17 @@ $([[ $MASTER_3 != "" ]] && echo "
 - $MASTER_3")
 resolvers:
 - $DNS_SERVER
-$([ $INSTALL_CEPH == true ] && echo \
-"rexray_config:
+rexray_config:
   rexray:
-  #  loglevel: debug #not needed
-  #modules:          #from doc but problematic
-  #  default-admin:
-  #    host: tcp://127.0.0.1:61003
-  libstorage:
-    service: rbd")
+    loglevel: info
+    modules:
+      default-admin:
+        host: tcp://127.0.0.1:61003
+    storageDrivers:
+    - ec2
+    volume:
+      unmount:
+        ignoreusedcount: true
 dcos_overlay_network:
   vtep_subnet: 192.15.0.0/20
   vtep_mac_oui: 70:B3:D5:00:00:00
@@ -530,9 +530,9 @@ EOF
 
 #install docker engine, daemon and service, along with dependencies
 sudo yum install -y  wget tar xz curl zip unzip ipset ntp nc screen bind-utils
-sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos 
+sudo yum install -y docker-engine-1.11.2-1.el7.centos docker-engine-selinux-1.11.2-1.el7.centos
 
-#configure ntp server $NTP_SERVER" 
+#configure ntp server $NTP_SERVER"
 sudo echo "server $NTP_SERVER"  > /etc/ntp.conf && \
 sudo systemctl start ntpd && \
 sudo systemctl enable ntpd
@@ -732,7 +732,7 @@ fi
 #if INSTALL_ELK=true
 
 #Ceph: install the newest REXRAY on agents and swap out the one in the DCOS installation
-if [ "$INSTALL_CEPH" == true ]; then 
+if [ "$INSTALL_CEPH" == true ]; then
 
 if [[ $ROLE == "slave" ]]; then
 echo "** INFO: Upgrading DC/OS Rexray for use with Ceph RBD..."
@@ -766,7 +766,7 @@ systemctl status dcos-rexray #show running version
 #format volumes/disks
 echo "** INFO: Formatting volume(s): "$CEPH_DISKS" for use with Ceph..."
 # just a name for the script below.
-CEPH_FDISK=ceph_fdisk_headless.sh 
+CEPH_FDISK=ceph_fdisk_headless.sh
 # Format disks as XFS
 cat > ./$CEPH_FDISK << EOF
 #!/bin/sh
@@ -861,7 +861,7 @@ ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
          $BLOCK_REGISTRY \
          $INSECURE_REGISTRY \
          --storage-driver=overlay \
-         --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000 
+         --insecure-registry registry.marathon.l4lb.thisdcos.directory:5000
 MountFlags=shared
 EOF
 systemctl daemon-reload
@@ -1041,7 +1041,7 @@ pip install requests
 
 #Install rexray on bootstrap node to access docker volumes in the cluster
 #########################################################################
-if [ "$INSTALL_CEPH" == true ]; then 
+if [ "$INSTALL_CEPH" == true ]; then
 
 curl -sSL https://dl.bintray.com/emccode/rexray/install | sh -s -- stable 0.8.2
 mkdir -p /etc/rexray
@@ -1084,7 +1084,7 @@ if [ -f $TEST_FILE ] && [ $(docker inspect -f {{.State.Running}} $NGINX_NAME) ==
   echo -e "sudo su"
   echo -e "cd"
   echo -e "curl -O http://$BOOTSTRAP_IP:$BOOTSTRAP_PORT/$NODE_INSTALLER && sudo bash $NODE_INSTALLER ${NC} [ROLE]"
-  echo -e "${RED}########################################################################################${NC}"  
+  echo -e "${RED}########################################################################################${NC}"
   echo -e ""
   echo -e ""
   echo -e "** This Agent installation command is also saved in $WORKING_DIR/$COMMAND_FILE for future use."
@@ -1109,7 +1109,7 @@ fi
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install ${BLUE}Marathon-LB${NC} on ${RED}Enterprise DC/OS${NC} executing as root here: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_marathon-lb.sh)${NC}"
 
-if [ "$INSTALL_CEPH" == true ]; then 
+if [ "$INSTALL_CEPH" == true ]; then
 echo -e "** ONCE YOUR CLUSTER IS UP AFTER INSTALLING MASTERS AND AGENTS, install and configure ${BLUE}Ceph${NC} executing as root here: "
 echo -e "${RED}source <(curl https://raw.githubusercontent.com/fernandosanchezmunoz/DCOS_installer/master/install_ceph.sh)${NC}"
 fi
