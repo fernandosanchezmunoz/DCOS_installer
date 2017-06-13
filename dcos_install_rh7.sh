@@ -207,6 +207,8 @@ pip3 install --upgrade pip jsonschema
 #wget ftp://bo.mirror.garr.it/2/scientific/7.3/x86_64/os/Packages/microcode_ctl-2.1-16.el7.x86_64.rpm
 #rpm -Uvh ./microcode_ctl-2.1-16.el7.x86_64.rpm
 
+#test
+
 #jq
 #wget http://stedolan.github.io/jq/download/linux64/jq
 wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32
