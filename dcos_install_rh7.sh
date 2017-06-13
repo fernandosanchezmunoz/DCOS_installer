@@ -71,6 +71,14 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+#make sure we're running on RHEL
+if [ $(grep "ID=" /etc/os-release | head -n1) != "ID=\"rhel\"" ]; then
+  echo "** This installer supports RHEL only. Aborting"
+  exit
+else
+  echo "** Operating system version check passed."
+fi
+
 #add DNS. AWS RH7.3 instances don't have one
 echo "nameserver $DNS_SERVER" >> /etc/resolv.conf
 
