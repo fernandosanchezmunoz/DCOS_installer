@@ -71,7 +71,7 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-#make sure we're running on RHEL 7.2
+#make sure we're running on RHEL
 if [ $(grep "ID=" /etc/os-release | head -n1) != "ID=\"rhel\"" ]; then
   echo "** This installer supports RHEL only. Aborting"
   exit
